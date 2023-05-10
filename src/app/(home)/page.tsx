@@ -9,11 +9,12 @@ export default function Home() {
         alt="kotakery logo"
         width={150}
         height={150}
+        className="intro-y"
       />
-      <h1 className="text-3xl font-bold text-red-500 intro-x mt-5">Kotakery</h1>
-      <div className="text-sm text-slate-500 mt-2">MERCHANT</div>
+      <h1 className="text-3xl font-bold text-red-500 intro-y mt-5">Kotakery</h1>
+      <div className="text-sm text-slate-500 mt-2 intro-y">MERCHANT</div>
       <div className="mt-10">
-        <Link href={'/auth/signin'} className="btn btn-transparent">
+        <Link href={'/auth/signin'} className="btn btn-transparent intro-y">
           MASUK
         </Link>
       </div>
