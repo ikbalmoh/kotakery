@@ -4,8 +4,12 @@ import {
   signInWithPhoneNumber,
   RecaptchaVerifier,
   ConfirmationResult,
+  User,
+  updateProfile,
 } from 'firebase/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
+import { merchantAccount } from '@/@types/account';
+import { storeMerchantData } from './db';
 
 export const auth = getAuth(firebase_app);
 auth.useDeviceLanguage();
@@ -25,8 +29,11 @@ auth.onAuthStateChanged(async (user) => {
   }
 });
 
-export async function requestVerificationCode(phoneNumber: string) {
-  const recaptchaVerifier = new RecaptchaVerifier(
+let recaptchaVerifier: RecaptchaVerifier | null;
+
+export const initializeRecaptcha = () => {
+  recaptchaVerifier?.clear();
+  recaptchaVerifier = new RecaptchaVerifier(
     'recaptcha-container',
     {
       size: 'invisible',
@@ -34,16 +41,17 @@ export async function requestVerificationCode(phoneNumber: string) {
     auth
   );
 
+  return Promise.resolve(recaptchaVerifier);
+};
+
+export async function requestVerificationCode(
+  phoneNumber: string,
+  appVerifier: RecaptchaVerifier
+) {
   try {
-    const result = await signInWithPhoneNumber(
-      auth,
-      phoneNumber,
-      recaptchaVerifier
-    );
-    recaptchaVerifier.clear();
+    const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
     return result;
   } catch (error) {
-    recaptchaVerifier.clear();
     throw error;
   }
 }
@@ -59,5 +67,23 @@ export async function verifyVerificationCode(
     throw error;
   }
 }
+
+export const registerMerchant = async (
+  merchant: merchantAccount,
+  code: string,
+  confirmationResult: ConfirmationResult
+) => {
+  try {
+    const authenticatedUser: User = await verifyVerificationCode(
+      code,
+      confirmationResult
+    );
+    await storeMerchantData(authenticatedUser.uid, merchant);
+    updateProfile(authenticatedUser, { displayName: merchant.name });
+    return;
+  } catch (error) {
+    throw error;
+  }
+};
 
 export const signOut = () => auth.signOut();

@@ -19,16 +19,31 @@ body {
   background-color: rgb(var(--background-rgb));
 }
 
-input.form-input {
-  @apply border border-slate-200 rounded-md w-full px-3 py-2 transition-all focus:border-blue-700 outline-none focus:shadow-md;
+div.input-group {
+  @apply flex items-center border border-slate-200 rounded-md w-full text-sm;
 }
 
+div.input-group .input-prefix {
+  @apply pl-3 select-none text-slate-500;
+}
+
+input.form-input,
+textarea.form-input {
+  @apply border border-slate-200 rounded-md w-full px-3 py-2 transition-all focus:border-blue-700 outline-none text-sm;
+}
+
+div.input-group > input.form-input {
+  @apply border-none;
+}
+
+div.input-group.error,
+textarea.form-input.error,
 input.form-input.error {
   @apply border-red-600;
 }
 
 button.btn {
-  @apply w-full bg-blue-600 hover:bg-blue-500 text-white px-5 py-3 rounded-md hover:shadow-lg shadow-md outline-none flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500;
+  @apply text-sm bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded-md hover:shadow-lg shadow-md outline-none flex items-center justify-center disabled:bg-gray-200 disabled:text-gray-500;
 }
 
 a.btn.btn-transparent,
@@ -42,7 +57,7 @@ button.btn span {
 
 button.btn i,
 button.btn img {
-  @apply ml-auto;
+  @apply ml-4;
 }
 
 @keyframes introY {

@@ -13,9 +13,18 @@ export default function Home() {
       />
       <h1 className="text-3xl font-bold text-red-500 intro-y mt-5">Kotakery</h1>
       <div className="text-sm text-slate-500 mt-2 intro-y">MERCHANT</div>
-      <div className="mt-10">
-        <Link href={'/auth/signin'} className="btn btn-transparent intro-y">
+      <div className="mt-10 flex items-center">
+        <Link
+          href={'/auth/signin'}
+          className="btn btn-transparent intro-y mx-2"
+        >
           MASUK
+        </Link>
+        <Link
+          href={'/auth/signup'}
+          className="btn btn-transparent intro-y mx-2"
+        >
+          DAFTAR
         </Link>
       </div>
     </main>
