@@ -1,4 +1,4 @@
-import { merchantAccount } from '@/@types/account';
+import { MerchantAccount } from '@/@types/account';
 import firebase_app from './config';
 import {
   getFirestore,
@@ -9,6 +9,7 @@ import {
   where,
   limit,
   getDocs,
+  getDoc,
 } from 'firebase/firestore';
 
 export const db = getFirestore(firebase_app);
@@ -38,11 +39,20 @@ export const isUsernameAvailable = async (username: string) => {
   return Promise.resolve(querySnapshot.size < 1);
 };
 
-export const storeMerchantData = async (
+export const storeMerchantAccount = async (
   uid: string,
-  merchant: merchantAccount
+  merchant: MerchantAccount
 ) => {
   return setDoc(doc(db, 'merchants', uid), merchant);
+};
+
+export const getMerchantAccount = async (uid: string) => {
+  const docSnapshot = await getDoc(doc(db, `merchants/${uid}`));
+  if (docSnapshot.exists()) {
+    const merchant: MerchantAccount = docSnapshot.data() as MerchantAccount;
+    return merchant;
+  }
+  return null;
 };
 
 export default db;

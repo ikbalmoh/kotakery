@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
 import Button from '@/components/Button';
-import { merchantAccount } from '@/@types/account';
+import { MerchantAccount } from '@/@types/account';
 import { registerMerchant } from '@/firebase/auth';
 import { ConfirmationResult } from 'firebase/auth';
 import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
@@ -11,13 +11,13 @@ import { useRouter } from 'next/navigation';
 import Cleave from 'cleave.js/react';
 
 type Props = {
-  accountData: merchantAccount;
+  AccountData: MerchantAccount;
   confirmationResult: ConfirmationResult;
   onBack: () => void;
 };
 
 export default function ActivationForm({
-  accountData,
+  AccountData,
   confirmationResult,
   onBack,
 }: Props) {
@@ -32,7 +32,7 @@ export default function ActivationForm({
   const onSubmitActivation = async (code: string) => {
     setLoading(true);
     try {
-      await registerMerchant(accountData, code, confirmationResult!);
+      await registerMerchant(AccountData, code, confirmationResult!);
       router.replace('/dashboard');
     } catch (error) {
       console.error(error);
@@ -58,7 +58,7 @@ export default function ActivationForm({
     <form onSubmit={form.handleSubmit} className={'intro-y'}>
       <div className="text-slate-500 text-sm mt-1 intro-y">
         Silahkan masukkan kode verifikasi yang telah kami kirimkan ke nomor{' '}
-        <span className="font-bold">{accountData.owner.phone}</span>
+        <span className="font-bold">{AccountData.owner.phone}</span>
       </div>
       <div className="flex flex-col mb-3 mt-8">
         <label htmlFor="code" className="form-label intro-y">

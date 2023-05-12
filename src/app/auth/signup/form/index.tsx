@@ -11,7 +11,7 @@ import StepWizard from '@/components/StepWizard';
 import MerchantForm from './MerchantForm';
 import AccountForm from './AccountForm';
 import ActivationForm from './ActivationForm';
-import { accountData, merchantData } from '../../../../@types/account';
+import { AccountData, MerchantData } from '../../../../@types/account';
 import { ConfirmationResult } from 'firebase/auth';
 
 const wizards: Array<{
@@ -29,12 +29,12 @@ const wizards: Array<{
 export default function SignupForm() {
   const [step, setStep] = useState<number>(1);
 
-  const [merchantFormValues, setMerchantFormValues] = useState<merchantData>();
-  const [accountFormValues, setAccountFormValues] = useState<accountData>();
+  const [merchantFormValues, setMerchantFormValues] = useState<MerchantData>();
+  const [accountFormValues, setAccountFormValues] = useState<AccountData>();
   const [confirmationResult, setConfirmationResult] =
     useState<ConfirmationResult>();
 
-  const onSubmitMerchant = (values: merchantData) => {
+  const onSubmitMerchant = (values: MerchantData) => {
     setStep(2);
     setMerchantFormValues(values);
     if (!accountFormValues?.phone) {
@@ -46,7 +46,7 @@ export default function SignupForm() {
     account,
     confirmationResult,
   }: {
-    account: accountData;
+    account: AccountData;
     confirmationResult: ConfirmationResult;
   }) => {
     try {
@@ -87,7 +87,7 @@ export default function SignupForm() {
           {step == 3 && (
             <ActivationForm
               onBack={() => setStep(2)}
-              accountData={{
+              AccountData={{
                 ...merchantFormValues,
                 owner: {
                   ...accountFormValues,

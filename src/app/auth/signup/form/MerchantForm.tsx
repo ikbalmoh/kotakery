@@ -2,21 +2,21 @@ import React, { useState } from 'react';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
-import { merchantData } from '@/@types/account';
+import { MerchantData } from '@/@types/account';
 import Cleave from 'cleave.js/react';
 import 'cleave.js/dist/addons/cleave-phone.id';
 import { isUsernameAvailable } from '@/firebase/db';
 import Button from '@/components/Button';
 
 type Props = {
-  onSubmit: (values: merchantData) => void;
-  initialValues?: merchantData;
+  onSubmit: (values: MerchantData) => void;
+  initialValues?: MerchantData;
 };
 
 export default function MerchantForm({ onSubmit, initialValues }: Props) {
   const [loading, setLoading] = useState<boolean>(false);
 
-  const handleSubmit = (values: merchantData) => {
+  const handleSubmit = (values: MerchantData) => {
     setLoading(true);
     onSubmit(values);
   };

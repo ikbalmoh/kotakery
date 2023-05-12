@@ -8,8 +8,8 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
-import { merchantAccount } from '@/@types/account';
-import { storeMerchantData } from './db';
+import { MerchantAccount } from '@/@types/account';
+import { storeMerchantAccount } from './db';
 
 export const auth = getAuth(firebase_app);
 auth.useDeviceLanguage();
@@ -69,7 +69,7 @@ export async function verifyVerificationCode(
 }
 
 export const registerMerchant = async (
-  merchant: merchantAccount,
+  merchant: MerchantAccount,
   code: string,
   confirmationResult: ConfirmationResult
 ) => {
@@ -78,8 +78,8 @@ export const registerMerchant = async (
       code,
       confirmationResult
     );
-    await storeMerchantData(authenticatedUser.uid, merchant);
-    updateProfile(authenticatedUser, { displayName: merchant.name });
+    await storeMerchantAccount(authenticatedUser.uid, merchant);
+    updateProfile(authenticatedUser, { displayName: merchant.owner.name });
     return;
   } catch (error) {
     throw error;

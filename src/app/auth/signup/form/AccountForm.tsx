@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
 import Cleave from 'cleave.js/react';
 import 'cleave.js/dist/addons/cleave-phone.id';
-import { accountData } from '@/@types/account';
+import { AccountData } from '@/@types/account';
 import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
 import { ConfirmationResult } from 'firebase/auth';
 import { requestVerificationCode } from '@/firebase/auth';
@@ -16,11 +16,11 @@ type Props = {
     account,
     confirmationResult,
   }: {
-    account: accountData;
+    account: AccountData;
     confirmationResult: ConfirmationResult;
   }) => void;
   onBack: () => void;
-  initialValues?: accountData;
+  initialValues?: AccountData;
 };
 
 export default function AccountForm({
@@ -33,7 +33,7 @@ export default function AccountForm({
   ) as RecaptchaContextType;
   const [loading, setLoading] = useState<boolean>(false);
 
-  const onSubmitAccount = async (values: accountData) => {
+  const onSubmitAccount = async (values: AccountData) => {
     setLoading(true);
     try {
       const phoneNumberRegistered = await isPhoneNumberRegistered(

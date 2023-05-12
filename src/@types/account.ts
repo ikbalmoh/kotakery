@@ -1,16 +1,16 @@
-export interface merchantData {
+export interface MerchantData {
   name?: string;
   username?: string;
   address?: string;
   phone?: string;
 }
 
-export interface accountData {
+export interface AccountData {
   name?: string;
   email?: string;
   phone?: string;
 }
 
-export interface merchantAccount extends merchantData {
-  owner: accountData;
+export interface MerchantAccount extends MerchantData {
+  owner: AccountData;
 }

@@ -19,7 +19,9 @@ export default function RootLayout({ children }: Props) {
         <body className={inter.className} suppressHydrationWarning={true}>
           <NextTopLoader color="#f75728" />
           <Navbar />
-          <main className="container mx-auto py-10">{children}</main>
+          <main className="container mx-auto py-4 md:py-10 px-4 md:px-0">
+            {children}
+          </main>
         </body>
       </html>
     </AuthProvider>
