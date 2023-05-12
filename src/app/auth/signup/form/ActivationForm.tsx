@@ -1,36 +1,77 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
+import Button from '@/components/Button';
+import { merchantAccount } from '@/@types/account';
+import { registerMerchant } from '@/firebase/auth';
+import { ConfirmationResult } from 'firebase/auth';
+import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
+import { useRouter } from 'next/navigation';
 import Cleave from 'cleave.js/react';
 
 type Props = {
-  onSubmit: (code: string) => void;
+  accountData: merchantAccount;
+  confirmationResult: ConfirmationResult;
   onBack: () => void;
 };
 
-export default function ActivationForm({ onSubmit, onBack }: Props) {
+export default function ActivationForm({
+  accountData,
+  confirmationResult,
+  onBack,
+}: Props) {
+  const router = useRouter();
+
+  const { resetRecaptcha } = useContext(
+    RecaptchaContext
+  ) as RecaptchaContextType;
+
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onSubmitActivation = async (code: string) => {
+    setLoading(true);
+    try {
+      await registerMerchant(accountData, code, confirmationResult!);
+      router.replace('/dashboard');
+    } catch (error) {
+      console.error(error);
+      resetRecaptcha();
+      setLoading(false);
+    }
+  };
+
   const form = useFormik({
     enableReinitialize: true,
     initialValues: {
       code: '',
     },
     validationSchema: yup.object().shape({
-      code: yup.string().required('masukkan kode verifikasi').length(6),
+      code: yup
+        .string()
+        .required('masukkan kode verifikasi')
+        .length(6, 'masukkan 6 digit kode'),
     }),
-    onSubmit: (values) => onSubmit(values.code),
+    onSubmit: (values) => onSubmitActivation(values.code),
   });
   return (
     <form onSubmit={form.handleSubmit} className={'intro-y'}>
-      <div className="flex flex-col mb-3">
-        <label htmlFor="name" className="text-sm mb-2 intro-y">
-          Kode Verifikasi
+      <div className="text-slate-500 text-sm mt-1 intro-y">
+        Silahkan masukkan kode verifikasi yang telah kami kirimkan ke nomor{' '}
+        <span className="font-bold">{accountData.owner.phone}</span>
+      </div>
+      <div className="flex flex-col mb-3 mt-8">
+        <label htmlFor="code" className="form-label intro-y">
+          Kode Verifikasi <span>*</span>
         </label>
-        <input
-          type="text"
-          className={`form-input ${form.errors.code ? 'error' : ''}`}
+        <Cleave
+          options={{ numericOnly: true, blocks: [1, 1, 1, 1, 1, 1] }}
+          className={classNames(
+            'form-input',
+            form.touched.code && form.errors.code ? 'error' : ''
+          )}
           name="code"
-          onChange={form.handleChange}
+          onChange={(e) => form.setFieldValue('code', e.target.rawValue)}
           onBlur={form.handleBlur}
           value={form.values.code}
         />
@@ -46,9 +87,7 @@ export default function ActivationForm({ onSubmit, onBack }: Props) {
         >
           <span>Kembali</span>
         </button>
-        <button className="btn intro-y w-min whitespace-nowrap" type="submit">
-          <span>Aktivasi</span>
-        </button>
+        <Button loading={loading} label="Aktivasi Akun" type="submit" />
       </div>
     </form>
   );

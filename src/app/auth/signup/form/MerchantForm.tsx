@@ -1,10 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
 import { merchantData } from '@/@types/account';
 import Cleave from 'cleave.js/react';
 import 'cleave.js/dist/addons/cleave-phone.id';
+import { isUsernameAvailable } from '@/firebase/db';
+import Button from '@/components/Button';
 
 type Props = {
   onSubmit: (values: merchantData) => void;
@@ -12,8 +14,10 @@ type Props = {
 };
 
 export default function MerchantForm({ onSubmit, initialValues }: Props) {
+  const [loading, setLoading] = useState<boolean>(false);
+
   const handleSubmit = (values: merchantData) => {
-    // TODO verify username and phone
+    setLoading(true);
     onSubmit(values);
   };
 
@@ -35,7 +39,20 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
         .matches(
           /^[A-Za-z0-9]+(?:[ _-][A-Za-z0-9]+)*$/,
           'hanya huruf dan angka'
-        ),
+        )
+        .test({
+          name: 'unique-username',
+          test: async (value, ctx) => {
+            if (!value) {
+              return ctx.createError({ message: 'buat username' });
+            }
+            const available: boolean = await isUsernameAvailable(value);
+            if (!available) {
+              return ctx.createError({ message: 'username tidak tersedia' });
+            }
+            return true;
+          },
+        }),
       address: yup.string().required('isi alamat toko'),
       phone: yup.string().test({
         name: 'phone',
@@ -53,18 +70,20 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
     onSubmit: handleSubmit,
   });
 
-  const generateUsername = (username: string) => {
-    form.setFieldValue(
-      'username',
-      username.toLowerCase().trim().replaceAll(' ', '')
-    );
+  const generateUsername = (name: string) => {
+    const username: string = name
+      .toLowerCase()
+      .trim()
+      .replaceAll(' ', '')
+      .replace(/[^a-zA-Z0-9]/g, '');
+    form.setFieldValue('username', username);
   };
 
   return (
-    <form onSubmit={form.handleSubmit} className={'intro-y'}>
+    <form onSubmit={form.handleSubmit} className="intro-y">
       <div className="flex flex-col mb-3">
-        <label htmlFor="name" className="text-sm mb-2 intro-y">
-          Nama Toko
+        <label htmlFor="name" className="form-label intro-y">
+          Nama Toko <span>*</span>
         </label>
 
         <input
@@ -86,8 +105,8 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
         </span>
       </div>
       <div className="flex flex-col mb-3">
-        <label htmlFor="name" className="text-sm mb-2 intro-y">
-          Username
+        <label htmlFor="name" className="form-label intro-y">
+          Username <span>*</span>
         </label>
         <div
           className={classNames(
@@ -106,13 +125,20 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
             placeholder="namatoko"
           />
         </div>
-        <span className="mt-2 text-xs text-red-500 intro-y">
-          {form.touched.username ? form.errors.username : ''}
-        </span>
+        {form.touched.username && form.errors.username ? (
+          <span className="mt-2 text-xs text-red-500 intro-y">
+            {form.touched.username ? form.errors.username : ''}
+          </span>
+        ) : (
+          <div className="mt-2 text-xs intro-y text-slate-500">
+            <span className="font-semibold">kotakery.com/</span>
+            <span className="">{form.values.username}</span>
+          </div>
+        )}
       </div>
       <div className="flex flex-col mb-3">
-        <label htmlFor="name" className="text-sm mb-2 intro-y">
-          Alamat
+        <label htmlFor="name" className="form-label intro-y">
+          Alamat <span>*</span>
         </label>
         <textarea
           className={classNames(
@@ -130,10 +156,10 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
         </span>
       </div>
       <div className="flex flex-col mb-3">
-        <label htmlFor="name" className="text-sm intro-y">
-          Nomor Whatsapp
+        <label htmlFor="name" className="form-label intro-y">
+          Nomor Whatsapp <span>*</span>
         </label>
-        <span className="mt-1 text-xs text-slate-500 intro-y mb-3">
+        <span className="text-xs text-slate-500 intro-y mb-3">
           Untuk menerima pesanan dari pelanggan
         </span>
         <Cleave
@@ -158,9 +184,7 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
         </span>
       </div>
       <div className="flex justify-end mt-8 ">
-        <button className="btn intro-y w-min whitespace-nowrap" type="submit">
-          <span>Selanjutnya</span>
-        </button>
+        <Button loading={loading} label="Selanjutnya" type="submit" />
       </div>
     </form>
   );

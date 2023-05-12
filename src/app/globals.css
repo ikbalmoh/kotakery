@@ -27,6 +27,14 @@ div.input-group .input-prefix {
   @apply pl-3 select-none text-slate-500;
 }
 
+label.form-label {
+  @apply text-sm mb-2 font-medium;
+}
+
+label.form-label span {
+  @apply text-red-500 text-sm;
+}
+
 input.form-input,
 textarea.form-input {
   @apply border border-slate-200 rounded-md w-full px-3 py-2 transition-all focus:border-blue-700 outline-none text-sm;

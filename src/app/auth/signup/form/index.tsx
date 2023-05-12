@@ -1,25 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import React, { useContext, useState } from 'react';
+import React, { useState } from 'react';
 import {
   UserIcon,
   BuildingStorefrontIcon,
   ShieldCheckIcon,
 } from '@heroicons/react/20/solid';
 import StepWizard from '@/components/StepWizard';
-import MerchantForm from './form/MerchantForm';
-import AccountForm from './form/AccountForm';
-import ActivationForm from './form/ActivationForm';
-import {
-  accountData,
-  merchantData,
-  merchantAccount,
-} from '../../../@types/account';
-import { requestVerificationCode, registerMerchant } from '@/firebase/auth';
+import MerchantForm from './MerchantForm';
+import AccountForm from './AccountForm';
+import ActivationForm from './ActivationForm';
+import { accountData, merchantData } from '../../../../@types/account';
 import { ConfirmationResult } from 'firebase/auth';
-import { useRouter } from 'next/navigation';
-import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
 
 const wizards: Array<{
   step: number;
@@ -34,12 +27,6 @@ const wizards: Array<{
 ];
 
 export default function SignupForm() {
-  const router = useRouter();
-
-  const { recaptcha, resetRecaptcha, clearRecaptcha } = useContext(
-    RecaptchaContext
-  ) as RecaptchaContextType;
-
   const [step, setStep] = useState<number>(1);
 
   const [merchantFormValues, setMerchantFormValues] = useState<merchantData>();
@@ -48,50 +35,26 @@ export default function SignupForm() {
     useState<ConfirmationResult>();
 
   const onSubmitMerchant = (values: merchantData) => {
-    setMerchantFormValues(values);
     setStep(2);
+    setMerchantFormValues(values);
     if (!accountFormValues?.phone) {
       setAccountFormValues({ ...accountFormValues, phone: values.phone });
     }
   };
 
-  const onSubmitAccount = async (values: accountData) => {
+  const onSubmitAccount = async ({
+    account,
+    confirmationResult,
+  }: {
+    account: accountData;
+    confirmationResult: ConfirmationResult;
+  }) => {
     try {
-      if (!recaptcha) {
-        resetRecaptcha();
-      }
-      const result: ConfirmationResult = await requestVerificationCode(
-        values.phone!,
-        recaptcha!
-      );
-      setAccountFormValues(values);
-      setConfirmationResult(result);
+      setAccountFormValues(account);
+      setConfirmationResult(confirmationResult);
       setStep(3);
-      const account = {
-        ...values,
-        merchant: { ...merchantFormValues },
-      };
-      console.log(account);
     } catch (error) {
       console.error(error);
-    }
-  };
-
-  const onSubmitActivation = async (code: string) => {
-    try {
-      const account: merchantAccount = {
-        ...merchantFormValues,
-        owner: {
-          ...accountFormValues,
-        },
-      };
-
-      await registerMerchant(account, code, confirmationResult!);
-      clearRecaptcha();
-      router.replace('/dashboard');
-    } catch (error) {
-      console.error(error);
-      resetRecaptcha();
     }
   };
 
@@ -123,8 +86,14 @@ export default function SignupForm() {
           )}
           {step == 3 && (
             <ActivationForm
-              onSubmit={onSubmitActivation}
               onBack={() => setStep(2)}
+              accountData={{
+                ...merchantFormValues,
+                owner: {
+                  ...accountFormValues,
+                },
+              }}
+              confirmationResult={confirmationResult!}
             />
           )}
         </div>

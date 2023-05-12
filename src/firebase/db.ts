@@ -25,6 +25,19 @@ export const isPhoneNumberRegistered = async (phoneNumber: string) => {
   return querySnapshot.size > 0 ? true : false;
 };
 
+export const isUsernameAvailable = async (username: string) => {
+  const forbidden: Array<string> = ['kotakery', 'cart'];
+  if (forbidden.includes(username)) {
+    return Promise.resolve(false);
+  }
+
+  const merchantRef = collection(db, 'merchants');
+  const q = query(merchantRef, where('username', '==', username));
+
+  const querySnapshot = await getDocs(q);
+  return Promise.resolve(querySnapshot.size < 1);
+};
+
 export const storeMerchantData = async (
   uid: string,
   merchant: merchantAccount

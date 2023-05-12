@@ -1,13 +1,24 @@
-import React from 'react';
+import React, { useContext, useState } from 'react';
 import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
 import Cleave from 'cleave.js/react';
 import 'cleave.js/dist/addons/cleave-phone.id';
 import { accountData } from '@/@types/account';
+import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
+import { ConfirmationResult } from 'firebase/auth';
+import { requestVerificationCode } from '@/firebase/auth';
+import Button from '@/components/Button';
+import { isPhoneNumberRegistered } from '@/firebase/db';
 
 type Props = {
-  onSubmit: (values: accountData) => void;
+  onSubmit: ({
+    account,
+    confirmationResult,
+  }: {
+    account: accountData;
+    confirmationResult: ConfirmationResult;
+  }) => void;
   onBack: () => void;
   initialValues?: accountData;
 };
@@ -17,6 +28,38 @@ export default function AccountForm({
   onBack,
   initialValues,
 }: Props) {
+  const { recaptcha, resetRecaptcha } = useContext(
+    RecaptchaContext
+  ) as RecaptchaContextType;
+  const [loading, setLoading] = useState<boolean>(false);
+
+  const onSubmitAccount = async (values: accountData) => {
+    setLoading(true);
+    try {
+      const phoneNumberRegistered = await isPhoneNumberRegistered(
+        values.phone!
+      );
+      if (phoneNumberRegistered) {
+        form.setErrors({ phone: 'nomor sudah terdaftar' });
+        setLoading(false);
+        return;
+      }
+      if (!recaptcha) {
+        resetRecaptcha();
+      }
+      const result: ConfirmationResult = await requestVerificationCode(
+        values.phone!,
+        recaptcha!
+      );
+      onSubmit({
+        account: values,
+        confirmationResult: result,
+      });
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
   const form = useFormik({
     initialValues: initialValues
       ? initialValues
@@ -41,14 +84,14 @@ export default function AccountForm({
         },
       }),
     }),
-    onSubmit,
+    onSubmit: onSubmitAccount,
   });
 
   return (
     <form onSubmit={form.handleSubmit} className={'intro-y'}>
       <div className="flex flex-col mb-3">
-        <label htmlFor="name" className="text-sm mb-2 intro-y">
-          Nama Lengkap Anda
+        <label htmlFor="name" className="form-label intro-y">
+          Nama Lengkap Anda <span>*</span>
         </label>
         <input
           type="text"
@@ -67,10 +110,10 @@ export default function AccountForm({
       </div>
 
       <div className="flex flex-col mb-3">
-        <label htmlFor="phone" className="text-sm intro-y">
-          Nomor Telepon
+        <label htmlFor="phone" className="form-label intro-y">
+          Nomor Telepon <span>*</span>
         </label>
-        <span className="mt-1 text-xs text-slate-500 intro-y mb-3">
+        <span className="text-xs text-slate-500 intro-y mb-3">
           Akan digunakan untuk aktivasi dan login. Pastikan nomor anda aktif
         </span>
         <Cleave
@@ -95,7 +138,7 @@ export default function AccountForm({
         </span>
       </div>
       <div className="flex flex-col mb-3">
-        <label htmlFor="email" className="text-sm mb-2 intro-y">
+        <label htmlFor="email" className="form-label intro-y">
           Email
         </label>
 
@@ -122,9 +165,7 @@ export default function AccountForm({
         >
           <span>Sebelumnya</span>
         </button>
-        <button className="btn intro-y w-min whitespace-nowrap" type="submit">
-          <span>Aktivasi</span>
-        </button>
+        <Button label="Aktifkan Akun" loading={loading} />
       </div>
     </form>
   );

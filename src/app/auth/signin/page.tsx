@@ -1,4 +1,4 @@
-import SigninForm from './SigninForm';
+import SigninForm from './form';
 import Image from 'next/image';
 
 export const metadata = {

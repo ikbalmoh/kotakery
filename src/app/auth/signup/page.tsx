@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import SignupForm from './SignupForm';
+import SignupForm from './form';
 
 export const metadata = {
   title: 'Registrasi | Kotakery Merchant',
