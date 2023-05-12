@@ -12,15 +12,17 @@ import Button from '@/components/Button';
 type Props = {
   phoneNumber: string;
   confirmationResult: ConfirmationResult;
+  onBack: () => void;
 };
 
 export default function VerificationForm({
   phoneNumber,
   confirmationResult,
+  onBack,
 }: Props) {
   const router = useRouter();
 
-  const { resetRecaptcha, clearRecaptcha } = useContext(
+  const { clearRecaptcha } = useContext(
     RecaptchaContext
   ) as RecaptchaContextType;
   const [loading, setLoading] = useState<boolean>(false);
@@ -32,7 +34,9 @@ export default function VerificationForm({
       clearRecaptcha();
       router.replace('/dashboard');
     } catch (error) {
-      resetRecaptcha();
+      verifyForm.setErrors({
+        code: 'Kode salah. Silahkan periksa kembali',
+      });
       setLoading(false);
       console.error(error);
     }
@@ -104,7 +108,11 @@ export default function VerificationForm({
           <div className="text-center my-5 text-xs text-slate-500 font-bold">
             atau
           </div>
-          <button type="button" className="btn btn-transparent text-xs intro-y">
+          <button
+            type="button"
+            className="btn btn-transparent text-xs intro-y"
+            onClick={onBack}
+          >
             Gunakan Nomor Lain
           </button>
         </div>
