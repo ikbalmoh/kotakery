@@ -26,6 +26,7 @@ export default function SigninForm() {
     <VerificationForm
       confirmationResult={confirmationResult!}
       phoneNumber={phoneNumber}
+      onBack={() => setStep(1)}
     />
   );
 }

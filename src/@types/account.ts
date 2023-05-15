@@ -1,8 +1,11 @@
+import { Timestamp } from 'firebase/firestore';
+
 export interface MerchantData {
   name?: string;
   username?: string;
   address?: string;
   phone?: string;
+  description?: string;
 }
 
 export interface AccountData {
@@ -11,6 +14,8 @@ export interface AccountData {
   phone?: string;
 }
 
-export interface MerchantAccount extends MerchantData {
+export default interface MerchantAccount extends MerchantData {
   owner: AccountData;
+  joinedAt?: Timestamp;
+  lastActivity?: Timestamp;
 }

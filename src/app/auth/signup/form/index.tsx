@@ -6,7 +6,7 @@ import {
   UserIcon,
   BuildingStorefrontIcon,
   ShieldCheckIcon,
-} from '@heroicons/react/20/solid';
+} from '@heroicons/react/24/outline';
 import StepWizard from '@/components/StepWizard';
 import MerchantForm from './MerchantForm';
 import AccountForm from './AccountForm';

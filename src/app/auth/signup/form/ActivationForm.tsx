@@ -3,7 +3,7 @@ import * as yup from 'yup';
 import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
 import Button from '@/components/Button';
-import { MerchantAccount } from '@/@types/account';
+import MerchantAccount from '@/@types/account';
 import { registerMerchant } from '@/firebase/auth';
 import { ConfirmationResult } from 'firebase/auth';
 import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';

@@ -8,14 +8,15 @@ import {
   updateProfile,
 } from 'firebase/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
-import { MerchantAccount } from '@/@types/account';
-import { storeMerchantAccount } from './db';
+import MerchantAccount from '@/@types/account';
+import { logMerchantLastActivityTime, registerMerchantAccount } from './db';
 
 export const auth = getAuth(firebase_app);
 auth.useDeviceLanguage();
 
 auth.onAuthStateChanged(async (user) => {
   if (user) {
+    logMerchantLastActivityTime(user.uid);
     setCookie('uid', user.uid);
     const token: string | undefined = await user?.getIdToken();
     if (token) {
@@ -78,7 +79,7 @@ export const registerMerchant = async (
       code,
       confirmationResult
     );
-    await storeMerchantAccount(authenticatedUser.uid, merchant);
+    await registerMerchantAccount(authenticatedUser.uid, merchant);
     updateProfile(authenticatedUser, { displayName: merchant.owner.name });
     return;
   } catch (error) {
@@ -86,4 +87,7 @@ export const registerMerchant = async (
   }
 };
 
-export const signOut = () => auth.signOut();
+export const signOut = async (uid: string) => {
+  await logMerchantLastActivityTime(uid);
+  return auth.signOut();
+};

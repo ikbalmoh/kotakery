@@ -36,6 +36,7 @@ label.form-label span {
 }
 
 input.form-input,
+select.form-select,
 textarea.form-input {
   @apply border border-slate-200 rounded-md w-full px-3 py-2 transition-all focus:border-blue-700 outline-none text-sm;
 }
@@ -46,6 +47,7 @@ div.input-group > input.form-input {
 
 div.input-group.error,
 textarea.form-input.error,
+select.form-select.error,
 input.form-input.error {
   @apply border-red-600;
 }

@@ -1,4 +1,4 @@
-import { MerchantAccount } from '@/@types/account';
+import MerchantAccount from '@/@types/account';
 import firebase_app from './config';
 import {
   getFirestore,
@@ -10,7 +10,11 @@ import {
   limit,
   getDocs,
   getDoc,
+  Timestamp,
+  addDoc,
 } from 'firebase/firestore';
+import Product from '@/@types/product';
+import { getCookie } from 'cookies-next';
 
 export const db = getFirestore(firebase_app);
 
@@ -39,11 +43,23 @@ export const isUsernameAvailable = async (username: string) => {
   return Promise.resolve(querySnapshot.size < 1);
 };
 
-export const storeMerchantAccount = async (
+export const registerMerchantAccount = async (
   uid: string,
   merchant: MerchantAccount
 ) => {
+  merchant.joinedAt = Timestamp.fromDate(new Date());
+  merchant.lastActivity = Timestamp.fromDate(new Date());
   return setDoc(doc(db, 'merchants', uid), merchant);
+};
+
+export const logMerchantLastActivityTime = async (uid: string) => {
+  return setDoc(
+    doc(db, 'merchants', uid),
+    {
+      lastActivity: Timestamp.fromDate(new Date()),
+    },
+    { merge: true }
+  );
 };
 
 export const getMerchantAccount = async (uid: string) => {
@@ -53,6 +69,18 @@ export const getMerchantAccount = async (uid: string) => {
     return merchant;
   }
   return null;
+};
+
+export const storeProduct = async (product: Product) => {
+  const uid = getCookie('uid');
+  product.merchantId = uid?.toString();
+  product.createdAt = Timestamp.fromDate(new Date());
+  product.updatedAt = null;
+  product.isAvailable = true;
+  console.log('Store Product', product);
+
+  const productRef = await addDoc(collection(db, 'products'), product);
+  return productRef;
 };
 
 export default db;

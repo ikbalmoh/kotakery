@@ -2,7 +2,7 @@ import React, { useState, useEffect, createContext } from 'react';
 import { auth } from '@/firebase/auth';
 import { User } from '@firebase/auth';
 import { useRouter } from 'next/navigation';
-import { MerchantAccount } from '@/@types/account';
+import MerchantAccount from '@/@types/account';
 import { getMerchantAccount } from '@/firebase/db';
 
 export interface AuthContextType {

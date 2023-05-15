@@ -8,7 +8,7 @@ import {
   BuildingStorefrontIcon,
   AdjustmentsVerticalIcon,
   ArrowRightOnRectangleIcon,
-} from '@heroicons/react/20/solid';
+} from '@heroicons/react/24/outline';
 import { Fragment, useContext, useState } from 'react';
 import { classNames } from '@/utils/helpers';
 import { AuthContext, AuthContextType } from '@/contexts/auth';
@@ -16,7 +16,7 @@ import Button from '@/components/Button';
 import Image from 'next/image';
 
 export default function Navbar() {
-  const { merchant } = useContext(AuthContext) as AuthContextType;
+  const { merchant, user } = useContext(AuthContext) as AuthContextType;
 
   const [signOutVisible, setSignOutVisible] = useState<boolean>(false);
   const [signingOut, setSigningOut] = useState<boolean>(false);
@@ -28,8 +28,10 @@ export default function Navbar() {
   };
 
   const onSignout = async () => {
-    setSigningOut(true);
-    await signOut();
+    if (user) {
+      signOut(user.uid);
+      setSigningOut(true);
+    }
   };
 
   return (
