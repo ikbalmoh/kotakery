@@ -1,6 +1,12 @@
-import { Timestamp } from 'firebase/firestore';
+import {
+  DocumentData,
+  QueryDocumentSnapshot,
+  SnapshotOptions,
+  Timestamp,
+} from 'firebase/firestore';
 
 export default interface Product {
+  id?: string;
   merchantId?: string;
   name: string;
   price: number;
@@ -10,3 +16,22 @@ export default interface Product {
   createdAt?: Timestamp;
   updatedAt?: Timestamp | null;
 }
+
+export const productConverter = {
+  toFirestore(product: Product): DocumentData {
+    return { name: product.name };
+  },
+
+  fromFirestore(
+    snapshot: QueryDocumentSnapshot,
+    options: SnapshotOptions
+  ): Product {
+    const data = snapshot.data(options)!;
+    return {
+      id: snapshot.id,
+      name: data.name,
+      price: data.price,
+      unit: data.unit,
+    };
+  },
+};

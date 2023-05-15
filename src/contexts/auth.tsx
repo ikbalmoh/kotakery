@@ -4,11 +4,12 @@ import { User } from '@firebase/auth';
 import { useRouter } from 'next/navigation';
 import MerchantAccount from '@/@types/account';
 import { getMerchantAccount } from '@/firebase/db';
+import { DocumentData } from 'firebase/firestore';
 
 export interface AuthContextType {
   user: User | null;
   setUser: (user: User | null) => void;
-  merchant: MerchantAccount | null;
+  merchant: MerchantAccount | undefined;
 }
 
 export const AuthContext = createContext<AuthContextType | null>(null);
@@ -16,19 +17,34 @@ export const AuthContext = createContext<AuthContextType | null>(null);
 function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [user, setUser] = useState<User | null>(null);
-  const [merchant, setMerchant] = useState<MerchantAccount | null>(null);
+  const [merchant, setMerchant] = useState<MerchantAccount | undefined>(
+    undefined
+  );
 
-  const handleUser = async (user: User | null) => {
-    if (!user) {
+  const loadMerchanAccount = async (uid: string) => {
+    const _merchant: MerchantAccount | undefined = await getMerchantAccount(
+      uid
+    );
+    if (!_merchant) {
       router.replace('/auth/signin');
     } else {
-      const _merchant: MerchantAccount | null = await getMerchantAccount(
-        user.uid
-      );
       setMerchant(_merchant);
-      setUser(user);
     }
   };
+
+  const handleUser = async (user: User | null) => {
+    setUser(user);
+    if (!user) {
+      router.replace('/auth/signin');
+    }
+  };
+
+  useEffect(() => {
+    if (user) {
+      loadMerchanAccount(user.uid);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   useEffect(() => {
     const unsubscribe = auth.onAuthStateChanged(handleUser);

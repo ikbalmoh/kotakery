@@ -1,24 +1,33 @@
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import { Listbox, Transition } from '@headlessui/react';
 import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
 
-type Props = {};
+type Props = {
+  value: string | null | undefined;
+  onChange: (id: string | null | undefined) => void;
+};
 
 interface CategoryType {
+  id: string | null;
   name: string;
 }
 
 const categories: Array<CategoryType> = [
-  { name: 'Semua Kategori' },
-  { name: 'Tanpa Kategori' },
+  { id: 'all', name: 'Semua Kategori' },
+  { id: null, name: 'Tanpa Kategori' },
 ];
 
-export default function SelectCategory({}: Props) {
+export default function SelectCategory({ value, onChange }: Props) {
   const [category, setCategory] = useState<CategoryType>(categories[0]);
+
+  useEffect(() => {
+    const _cat = categories.find((c) => c.id === value);
+    setCategory(_cat ?? categories[0]);
+  }, [value]);
 
   return (
     <div className="w-full">
-      <Listbox value={category} onChange={setCategory}>
+      <Listbox value={category} onChange={({ id }) => onChange(id)}>
         <div className="relative">
           <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-red-300 sm:text-sm">
             <span className="block truncate">{category.name}</span>
