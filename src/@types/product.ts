@@ -34,6 +34,7 @@ export const productConverter = {
       price: data.price,
       unit: data.unit,
       categoryId: data.categoryId,
+      isAvailable: data.isAvailable,
     };
   },
 };

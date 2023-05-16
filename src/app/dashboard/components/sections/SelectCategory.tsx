@@ -58,6 +58,9 @@ export default function SelectCategory({
         );
 
   useEffect(() => {
+    if (!user) {
+      return;
+    }
     const q = query(
       collection(db, 'categories'),
       where('merchantId', '==', user?.uid),

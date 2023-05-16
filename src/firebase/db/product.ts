@@ -10,6 +10,7 @@ import {
   getDoc,
   getDocs,
   query,
+  updateDoc,
   where,
 } from 'firebase/firestore';
 import db from './db';
@@ -107,4 +108,14 @@ export const merchantProducts = async (categoryId?: string | null) => {
     console.error(error);
     throw error;
   }
+};
+
+export const updateProductAvailability = async (
+  id: string,
+  available: boolean
+) => {
+  const productRef = doc(db, 'products', id);
+  return updateDoc(productRef, {
+    isAvailable: available,
+  });
 };

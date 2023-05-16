@@ -120,6 +120,14 @@ button.btn img {
   display: table;
 }
 
+.table.table-hover tbody tr {
+  @apply hover:bg-slate-50 transition;
+}
+
+.table tbody tr.disabled {
+  @apply bg-red-50 text-slate-500;
+}
+
 .table td {
   @apply border-b px-5 py-3;
 }
