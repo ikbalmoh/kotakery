@@ -23,6 +23,7 @@
     "formik": "^2.2.9",
     "next": "13.4.1",
     "nextjs-toploader": "^1.4.2",
+    "numeral": "^2.0.6",
     "postcss": "8.4.23",
     "react": "18.2.0",
     "react-dom": "18.2.0",
@@ -32,6 +33,7 @@
     "yup": "^1.1.1"
   },
   "devDependencies": {
-    "@types/cleave.js": "^1.4.7"
+    "@types/cleave.js": "^1.4.7",
+    "@types/numeral": "^2.0.2"
   }
 }

@@ -5,6 +5,8 @@ import {
   Timestamp,
   addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   query,
   where,
@@ -33,6 +35,23 @@ export const storeCategory = async (name: string) => {
 
   const categoryRef = await addDoc(collection(db, 'categories'), category);
   return categoryRef.id;
+};
+
+export const getCategory = async (uid: string) => {
+  try {
+    const path = `categories/${uid}`;
+    const docSnapshot = await getDoc(doc(db, path));
+
+    const category: Category = {
+      id: docSnapshot.id,
+      name: docSnapshot.data()?.name,
+    };
+
+    return category;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
 };
 
 export const merchantProducts = async (categoryId?: string | null) => {

@@ -25,12 +25,10 @@ export default function SelectCategory({
   const defaultCategory: Category = { id: null, name: 'Semua Etalase' };
 
   const [category, setCategory] = useState<Category | null>(
-    nullable ? null : defaultCategory
+    nullable ? defaultCategory : null
   );
 
-  const [categories, setCategoies] = useState<Array<Category>>([
-    defaultCategory,
-  ]);
+  const [categories, setCategoies] = useState<Array<Category>>([]);
 
   const [search, setSearch] = useState<string>('');
 
@@ -48,7 +46,7 @@ export default function SelectCategory({
     const q = query(collection(db, 'categories'));
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const _categories: Array<Category> = [];
-      if (!nullable) {
+      if (nullable) {
         _categories.push(defaultCategory);
       }
       querySnapshot.forEach((doc) => {
@@ -67,9 +65,9 @@ export default function SelectCategory({
   useEffect(() => {
     if (value) {
       const _cat = categories.find((c) => c.id === value);
-      setCategory(_cat ?? defaultCategory);
+      setCategory(_cat ?? null);
     } else {
-      setCategory(nullable ? null : defaultCategory);
+      setCategory(nullable ? defaultCategory : null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);

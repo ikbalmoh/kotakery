@@ -110,16 +110,19 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
                         Etalase Produk
                       </label>
                       <SelectCategory
-                        error={form.errors.categoryId != undefined}
+                        error={
+                          form.touched.categoryId &&
+                          form.errors.categoryId != undefined
+                        }
                         allowAdd
-                        nullable
                         value={form.values.categoryId}
                         onChange={(value) =>
                           form.setFieldValue('categoryId', value)
                         }
+                        nullable={false}
                       />
                       <span className="mt-2 text-xs text-red-500 intro-y">
-                        {form.errors.categoryId}
+                        {form.touched.categoryId ? form.errors.categoryId : ''}
                       </span>
                     </div>
                     <div className="col-span-12 flex flex-col">
