@@ -3,7 +3,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Button from '@/components/Button';
 import SelectCategory from './SelectCategory';
-import { CubeIcon } from '@heroicons/react/24/outline';
+import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
 import AddProductDialog from './AddProductDialog';
 import Product, { productConverter } from '@/@types/product';
 import {
@@ -71,7 +71,7 @@ export default function Products({}: Props) {
       unsubscribe();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [categoryId]);
+  }, [categoryId, user]);
 
   if (!user) {
     return (
@@ -102,16 +102,11 @@ export default function Products({}: Props) {
         <div className="mt-8">
           {products.length == 0 ? (
             <div className="flex flex-col py-52 items-center">
-              <CubeIcon className="w-28 h-28 text-slate-300" />
+              <ArchiveBoxIcon className="w-28 h-28 text-slate-300" />
               <div className="text-slate-400 text-lg mt-5 flex flex-col items-center">
                 <span>
-                  {category
-                    ? 'Belum ada produk di etalase'
-                    : 'Belum ada produk'}
+                  {category ? 'Etalase masih kosong' : 'Belum ada produk'}
                 </span>
-                {category && (
-                  <span className="font-medium">{category.name}</span>
-                )}
               </div>
             </div>
           ) : (
@@ -120,7 +115,7 @@ export default function Products({}: Props) {
                 <tr>
                   <th>Nama Produk</th>
                   <th className="text-right">Harga</th>
-                  <th>Satuan</th>
+                  <th className="text-left w-32">Satuan</th>
                 </tr>
               </thead>
               <tbody>
@@ -128,7 +123,9 @@ export default function Products({}: Props) {
                   <tr key={p.id}>
                     <td>{p.name}</td>
                     <td className="text-right">Rp {currency(p.price)}</td>
-                    <td>{p.unit}</td>
+                    <td className="text-left text-slate-500 text-sm">
+                      /{p.unit}
+                    </td>
                   </tr>
                 ))}
               </tbody>

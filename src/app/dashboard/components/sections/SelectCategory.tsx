@@ -1,11 +1,26 @@
-import React, { Fragment, useEffect, useState } from 'react';
+import React, {
+  Fragment,
+  useEffect,
+  useState,
+  useRef,
+  Ref,
+  MutableRefObject,
+  useContext,
+} from 'react';
 import { Combobox, Transition } from '@headlessui/react';
 import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
 import db from '@/firebase/db/db';
-import { collection, onSnapshot, query } from 'firebase/firestore';
+import {
+  collection,
+  onSnapshot,
+  orderBy,
+  query,
+  where,
+} from 'firebase/firestore';
 import { classNames } from '@/utils/helpers';
 import Category from '@/@types/category';
 import { storeCategory } from '@/firebase/db/product';
+import { AuthContext, AuthContextType } from '@/contexts/auth';
 
 type Props = {
   value: string | null;
@@ -22,14 +37,14 @@ export default function SelectCategory({
   allowAdd,
   nullable,
 }: Props) {
+  const { user } = useContext(AuthContext) as AuthContextType;
+
   const defaultCategory: Category = { id: null, name: 'Semua Etalase' };
 
   const [category, setCategory] = useState<Category | null>(
     nullable ? defaultCategory : null
   );
-
   const [categories, setCategoies] = useState<Array<Category>>([]);
-
   const [search, setSearch] = useState<string>('');
 
   const filteredCategories =
@@ -43,7 +58,11 @@ export default function SelectCategory({
         );
 
   useEffect(() => {
-    const q = query(collection(db, 'categories'));
+    const q = query(
+      collection(db, 'categories'),
+      where('merchantId', '==', user?.uid),
+      orderBy('name', 'asc')
+    );
     const unsubscribe = onSnapshot(q, (querySnapshot) => {
       const _categories: Array<Category> = [];
       if (nullable) {
@@ -60,7 +79,7 @@ export default function SelectCategory({
 
     return () => unsubscribe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [user]);
 
   useEffect(() => {
     if (value) {

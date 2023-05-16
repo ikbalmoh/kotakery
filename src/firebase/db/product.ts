@@ -6,6 +6,7 @@ import {
   addDoc,
   collection,
   doc,
+  getCountFromServer,
   getDoc,
   getDocs,
   query,
@@ -13,6 +14,27 @@ import {
 } from 'firebase/firestore';
 import db from './db';
 import Category from '@/@types/category';
+
+export const getSummaries = async () => {
+  const uid = getCookie('uid');
+
+  const categoryQ = query(
+    collection(db, 'categories'),
+    where('merchantId', '==', uid)
+  );
+  const categorySnapshot = await getCountFromServer(categoryQ);
+
+  const productQ = query(
+    collection(db, 'products'),
+    where('merchantId', '==', uid)
+  );
+  const productSnapshot = await getCountFromServer(productQ);
+
+  return {
+    categories: categorySnapshot.data().count,
+    products: productSnapshot.data().count,
+  };
+};
 
 export const storeProduct = async (product: Product) => {
   const uid = getCookie('uid');
