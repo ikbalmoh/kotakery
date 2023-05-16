@@ -5,16 +5,14 @@ import Button from '@/components/Button';
 import SelectCategory from './SelectCategory';
 import { CubeIcon } from '@heroicons/react/24/outline';
 import AddProductDialog from './AddProductDialog';
-import { merchantProducts } from '@/firebase/db';
+import { merchantProducts } from '@/firebase/db/product';
 import Product from '@/@types/product';
 import { Unsubscribe } from 'firebase/auth';
 
 type Props = {};
 
 export default function Products({}: Props) {
-  const [categoryId, setCategoryId] = useState<string | null | undefined>(
-    undefined
-  );
+  const [categoryId, setCategoryId] = useState<string | null>(null);
   const [products, setProducts] = useState<Array<Product>>([]);
 
   const [productDialogVisible, setProductDialogVisible] =

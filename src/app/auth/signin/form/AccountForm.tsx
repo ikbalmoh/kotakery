@@ -4,7 +4,7 @@ import { useFormik } from 'formik';
 import { classNames } from '@/utils/helpers';
 import Button from '@/components/Button';
 import Link from 'next/link';
-import { isPhoneNumberRegistered } from '@/firebase/db';
+import { isPhoneNumberRegistered } from '@/firebase/db/account';
 import { ConfirmationResult } from 'firebase/auth';
 import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
 import { requestVerificationCode } from '@/firebase/auth';

@@ -8,6 +8,7 @@ import {
 export default interface Product {
   id?: string;
   merchantId?: string;
+  categoryId: string;
   name: string;
   price: number;
   unit: string;
@@ -32,6 +33,7 @@ export const productConverter = {
       name: data.name,
       price: data.price,
       unit: data.unit,
+      categoryId: data.categoryId,
     };
   },
 };

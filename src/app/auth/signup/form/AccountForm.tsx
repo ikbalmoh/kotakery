@@ -9,7 +9,7 @@ import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
 import { ConfirmationResult } from 'firebase/auth';
 import { requestVerificationCode } from '@/firebase/auth';
 import Button from '@/components/Button';
-import { isPhoneNumberRegistered } from '@/firebase/db';
+import { isPhoneNumberRegistered } from '@/firebase/db/account';
 
 type Props = {
   onSubmit: ({

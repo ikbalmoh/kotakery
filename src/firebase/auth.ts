@@ -9,7 +9,10 @@ import {
 } from 'firebase/auth';
 import { setCookie, deleteCookie } from 'cookies-next';
 import MerchantAccount from '@/@types/account';
-import { logMerchantLastActivityTime, registerMerchantAccount } from './db';
+import {
+  logMerchantLastActivityTime,
+  registerMerchantAccount,
+} from './db/account';
 
 export const auth = getAuth(firebase_app);
 auth.useDeviceLanguage();
@@ -29,21 +32,6 @@ auth.onAuthStateChanged(async (user) => {
     deleteCookie('id_token');
   }
 });
-
-let recaptchaVerifier: RecaptchaVerifier | null;
-
-export const initializeRecaptcha = () => {
-  recaptchaVerifier?.clear();
-  recaptchaVerifier = new RecaptchaVerifier(
-    'recaptcha-container',
-    {
-      size: 'invisible',
-    },
-    auth
-  );
-
-  return Promise.resolve(recaptchaVerifier);
-};
 
 export async function requestVerificationCode(
   phoneNumber: string,

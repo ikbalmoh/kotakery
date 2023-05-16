@@ -42,10 +42,11 @@ export default function SelectUnit({ value, onChange, error }: Props) {
         <div className="relative">
           <div className="relative w-full cursor-default overflow-hidden text-left focus:outline-none sm:text-sm">
             <Combobox.Input
-              className={classNames('form-input', error ? 'error' : '')}
+              className={classNames('form-input intro-y', error ? 'error' : '')}
               displayValue={(unit: string) => unit}
               onChange={(e) => handleChange(e.target.value)}
               onBlur={(e) => handleChange(e.target.value)}
+              placeholder="satuan produk"
             />
           </div>
           <Transition

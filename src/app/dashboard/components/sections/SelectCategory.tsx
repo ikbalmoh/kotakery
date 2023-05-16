@@ -1,62 +1,149 @@
 import React, { Fragment, useEffect, useState } from 'react';
-import { Listbox, Transition } from '@headlessui/react';
-import { CheckIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
+import { Combobox, Transition } from '@headlessui/react';
+import { ChevronUpDownIcon } from '@heroicons/react/24/outline';
+import db from '@/firebase/db/db';
+import { collection, onSnapshot, query } from 'firebase/firestore';
+import { classNames } from '@/utils/helpers';
+import Category from '@/@types/category';
+import { storeCategory } from '@/firebase/db/product';
 
 type Props = {
-  value: string | null | undefined;
-  onChange: (id: string | null | undefined) => void;
+  value: string | null;
+  onChange: (id: string | null) => void;
+  error?: boolean;
+  allowAdd?: boolean;
+  nullable?: boolean;
 };
 
-interface CategoryType {
-  id: string | null;
-  name: string;
-}
+export default function SelectCategory({
+  value,
+  onChange,
+  error,
+  allowAdd,
+  nullable,
+}: Props) {
+  const defaultCategory: Category = { id: null, name: 'Semua Etalase' };
 
-const categories: Array<CategoryType> = [
-  { id: 'all', name: 'Semua Kategori' },
-  { id: null, name: 'Tanpa Kategori' },
-];
+  const [category, setCategory] = useState<Category | null>(
+    nullable ? null : defaultCategory
+  );
 
-export default function SelectCategory({ value, onChange }: Props) {
-  const [category, setCategory] = useState<CategoryType>(categories[0]);
+  const [categories, setCategoies] = useState<Array<Category>>([
+    defaultCategory,
+  ]);
+
+  const [search, setSearch] = useState<string>('');
+
+  const filteredCategories =
+    search === ''
+      ? categories
+      : categories.filter((cat) =>
+          cat.name
+            .toLowerCase()
+            .replace(/\s+/g, '')
+            .includes(search.toLowerCase().replace(/\s+/g, ''))
+        );
 
   useEffect(() => {
-    const _cat = categories.find((c) => c.id === value);
-    setCategory(_cat ?? categories[0]);
+    const q = query(collection(db, 'categories'));
+    const unsubscribe = onSnapshot(q, (querySnapshot) => {
+      const _categories: Array<Category> = [];
+      if (!nullable) {
+        _categories.push(defaultCategory);
+      }
+      querySnapshot.forEach((doc) => {
+        _categories.push({
+          id: doc.id,
+          name: doc.data().name,
+        });
+      });
+      setCategoies(_categories);
+    });
+
+    return () => unsubscribe();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (value) {
+      const _cat = categories.find((c) => c.id === value);
+      setCategory(_cat ?? defaultCategory);
+    } else {
+      setCategory(nullable ? null : defaultCategory);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [value]);
+
+  const handleChange = async (value: Category) => {
+    if (value?.id === 'new') {
+      const id: string = await storeCategory(value.name);
+      onChange(id);
+    } else {
+      onChange(value?.id ?? null);
+    }
+  };
 
   return (
     <div className="w-full">
-      <Listbox value={category} onChange={({ id }) => onChange(id)}>
+      <Combobox value={category} onChange={handleChange} nullable>
         <div className="relative">
-          <Listbox.Button className="relative w-full cursor-default rounded-lg bg-white py-2 pl-3 pr-10 text-left shadow-md focus:outline-none focus-visible:border-indigo-500 focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-opacity-75 focus-visible:ring-offset-2 focus-visible:ring-offset-red-300 sm:text-sm">
-            <span className="block truncate">{category.name}</span>
-            <span className="pointer-events-none absolute inset-y-0 right-0 flex items-center pr-2">
+          <div className="relative w-full cursor-default overflow-hidden text-left focus:outline-none sm:text-sm">
+            <Combobox.Input
+              className={classNames('form-input', error ? 'error' : '')}
+              displayValue={(category: Category) => category?.name}
+              onChange={(e) => setSearch(e.target.value)}
+              placeholder={
+                allowAdd ? 'Pilih atau buat etalase baru' : 'Pilih etalase'
+              }
+            />
+            <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon
                 className="h-5 w-5 text-gray-400"
                 aria-hidden="true"
               />
-            </span>
-          </Listbox.Button>
+            </Combobox.Button>
+          </div>
           <Transition
             as={Fragment}
             leave="transition ease-in duration-100"
             leaveFrom="opacity-100"
             leaveTo="opacity-0"
+            afterLeave={() => setSearch('')}
           >
-            <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
-              {categories.map((category, categoryIdx) => (
-                <Listbox.Option
-                  key={categoryIdx}
-                  className={({ active }) =>
-                    `relative cursor-default select-none py-2 pr-10 pl-4 ${
-                      active ? 'bg-red-100 text-red-900' : 'text-gray-900'
-                    }`
-                  }
-                  value={category}
-                >
-                  {({ selected }) => (
-                    <>
+            <Combobox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-md bg-white py-1 text-base shadow-lg  focus:outline-none sm:text-sm">
+              {filteredCategories.length === 0 && search !== '' ? (
+                allowAdd ? (
+                  <Combobox.Option
+                    value={{
+                      id: 'new',
+                      name: search,
+                    }}
+                    className={({ active }) =>
+                      `relative cursor-default select-none py-2 px-4 ${
+                        active ? 'bg-teal-600 text-white' : 'text-gray-900'
+                      }`
+                    }
+                  >
+                    Buat etalase baru{' '}
+                    <span className="font-bold">{search}</span>
+                  </Combobox.Option>
+                ) : (
+                  <div className="bg-white text-slate-500 text-xs py-2 px-4 text-center">
+                    etalase tidak diemukan
+                  </div>
+                )
+              ) : (
+                filteredCategories.map((category) => (
+                  <Combobox.Option
+                    key={category.id}
+                    className={({ active }) =>
+                      `relative cursor-default select-none py-2 px-4 ${
+                        active ? 'bg-teal-600 text-white' : 'text-gray-900'
+                      }`
+                    }
+                    value={category}
+                  >
+                    {({ selected, active }) => (
                       <span
                         className={`block truncate ${
                           selected ? 'font-medium' : 'font-normal'
@@ -64,19 +151,14 @@ export default function SelectCategory({ value, onChange }: Props) {
                       >
                         {category.name}
                       </span>
-                      {selected && (
-                        <span className="absolute inset-y-0 right-0 flex items-center pr-3 text-red-600">
-                          <CheckIcon className="h-5 w-5" aria-hidden="true" />
-                        </span>
-                      )}
-                    </>
-                  )}
-                </Listbox.Option>
-              ))}
-            </Listbox.Options>
+                    )}
+                  </Combobox.Option>
+                ))
+              )}
+            </Combobox.Options>
           </Transition>
         </div>
-      </Listbox>
+      </Combobox>
     </div>
   );
 }

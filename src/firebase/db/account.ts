@@ -1,27 +1,17 @@
-import MerchantAccount, { merchantAccountConverter } from '@/@types/account';
-import firebase_app from './config';
 import {
-  getFirestore,
-  doc,
-  setDoc,
-  collection,
-  query,
-  where,
-  limit,
-  getDocs,
-  getDoc,
   Timestamp,
-  addDoc,
-  onSnapshot,
-  QuerySnapshot,
-  Unsubscribe,
+  collection,
+  doc,
+  getDoc,
+  getDocs,
+  limit,
+  query,
+  setDoc,
   updateDoc,
-  QueryConstraint,
+  where,
 } from 'firebase/firestore';
-import Product, { productConverter } from '@/@types/product';
-import { getCookie } from 'cookies-next';
-
-export const db = getFirestore(firebase_app);
+import db from './db';
+import MerchantAccount, { merchantAccountConverter } from '@/@types/account';
 
 export const isPhoneNumberRegistered = async (phoneNumber: string) => {
   const merchantRef = collection(db, 'merchants');
@@ -79,49 +69,3 @@ export const getMerchantAccount = async (uid: string) => {
     throw error;
   }
 };
-
-export const storeProduct = async (product: Product) => {
-  const uid = getCookie('uid');
-  product.merchantId = uid?.toString();
-  product.createdAt = Timestamp.fromDate(new Date());
-  product.updatedAt = null;
-  product.isAvailable = true;
-
-  const productRef = await addDoc(collection(db, 'products'), product);
-  return productRef;
-};
-
-export const merchantProducts = async (categoryId?: string | null) => {
-  try {
-    const uid = getCookie('uid');
-
-    const products: Array<Product> = [];
-
-    const whereQuery: Array<QueryConstraint> = [where('merchantId', '==', uid)];
-
-    if (categoryId) {
-      whereQuery.push(where('categoryId', '==', categoryId));
-    }
-
-    const q = query(
-      collection(db, 'products').withConverter<Product>(productConverter),
-      ...whereQuery
-    );
-
-    const querySnapshot = await getDocs(q);
-
-    querySnapshot.forEach((doc) => {
-      const product: Product = doc.data();
-      product.id = doc.id;
-
-      products.push(product);
-    });
-
-    return products;
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-};
-
-export default db;

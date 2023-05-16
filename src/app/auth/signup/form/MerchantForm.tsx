@@ -5,7 +5,7 @@ import { classNames } from '@/utils/helpers';
 import { MerchantData } from '@/@types/account';
 import Cleave from 'cleave.js/react';
 import 'cleave.js/dist/addons/cleave-phone.id';
-import { isUsernameAvailable } from '@/firebase/db';
+import { isUsernameAvailable } from '@/firebase/db/account';
 import Button from '@/components/Button';
 
 type Props = {

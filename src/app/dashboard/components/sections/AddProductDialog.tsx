@@ -6,9 +6,10 @@ import React, { Fragment, useState } from 'react';
 import * as yup from 'yup';
 import Cleave from 'cleave.js/react';
 import SelectUnit from './SelectUnit';
-import { storeProduct } from '@/firebase/db';
+import { storeProduct } from '@/firebase/db/product';
 import Product from '@/@types/product';
 import toast from 'react-hot-toast';
+import SelectCategory from './SelectCategory';
 
 type Props = {
   visible: boolean;
@@ -21,12 +22,14 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
   const form = useFormik({
     initialValues: {
       name: '',
+      categoryId: '',
       description: '',
       price: undefined,
-      unit: 'item',
+      unit: '',
     },
     validationSchema: yup.object({
       name: yup.string().required('isi nama produk'),
+      categoryId: yup.string().required('pilih etalase'),
       price: yup
         .number()
         .min(0, 'tidak boleh minus')
@@ -40,6 +43,7 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
         price: values.price ?? 0,
         description: values.description,
         unit: values.unit,
+        categoryId: values.categoryId,
       };
       submitProduct(product);
     },
@@ -101,6 +105,23 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
                     Tambah Produk
                   </Dialog.Title>
                   <div className="mt-5 grid grid-cols-12 gap-3">
+                    <div className="col-span-12 flex flex-col">
+                      <label htmlFor="name" className="form-label intro-y">
+                        Etalase Produk
+                      </label>
+                      <SelectCategory
+                        error={form.errors.categoryId != undefined}
+                        allowAdd
+                        nullable
+                        value={form.values.categoryId}
+                        onChange={(value) =>
+                          form.setFieldValue('categoryId', value)
+                        }
+                      />
+                      <span className="mt-2 text-xs text-red-500 intro-y">
+                        {form.errors.categoryId}
+                      </span>
+                    </div>
                     <div className="col-span-12 flex flex-col">
                       <label htmlFor="name" className="form-label intro-y">
                         Nama Produk
