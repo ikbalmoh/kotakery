@@ -1,4 +1,5 @@
 import {
+  QuerySnapshot,
   Timestamp,
   collection,
   doc,
@@ -64,6 +65,22 @@ export const getMerchantAccount = async (uid: string) => {
     const account = docSnapshot.data();
 
     return account;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const getMerchantByUsername = async (username: string) => {
+  try {
+    const merchantRef = collection(db, 'merchants');
+    const q = query(merchantRef, where('username', '==', username));
+
+    const querySnapshot = await getDocs(q);
+    if (querySnapshot.size > 0) {
+      return querySnapshot.docs[0].data() as MerchantAccount;
+    }
+    return null;
   } catch (error) {
     console.error(error);
     throw error;
