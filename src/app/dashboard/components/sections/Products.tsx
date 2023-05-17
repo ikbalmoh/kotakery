@@ -3,7 +3,11 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Button from '@/components/Button';
 import SelectCategory from './SelectCategory';
-import { ArchiveBoxIcon } from '@heroicons/react/24/outline';
+import {
+  ArchiveBoxIcon,
+  PencilIcon,
+  TrashIcon,
+} from '@heroicons/react/24/outline';
 import AddProductDialog from './AddProductDialog';
 import Product, { productConverter } from '@/@types/product';
 import {
@@ -21,6 +25,7 @@ import { getCategory, updateProductAvailability } from '@/firebase/db/product';
 import { currency } from '@/utils/formater';
 import { Switch } from '@headlessui/react';
 import { classNames } from '@/utils/helpers';
+import DeleteProductDialog from './DeleteProductDialog';
 
 type Props = {};
 
@@ -30,6 +35,10 @@ export default function Products({}: Props) {
   const [categoryId, setCategoryId] = useState<string | null>(null);
   const [products, setProducts] = useState<Array<Product>>([]);
   const [category, setCategory] = useState<Category | null>(null);
+  const [editProduct, setEditProduct] = useState<Product>();
+  const [deleteProduct, setDeleteProduct] = useState<Product | undefined>(
+    undefined
+  );
 
   const [productDialogVisible, setProductDialogVisible] =
     useState<boolean>(false);
@@ -37,6 +46,16 @@ export default function Products({}: Props) {
   const loadCategory = async (categoryId: string) => {
     const c: Category = await getCategory(categoryId);
     setCategory(c);
+  };
+
+  const onNewProduct = () => {
+    setEditProduct(undefined);
+    setProductDialogVisible(true);
+  };
+
+  const onEditProduct = (product: Product) => {
+    setEditProduct(product);
+    setProductDialogVisible(true);
   };
 
   useEffect(() => {
@@ -76,8 +95,8 @@ export default function Products({}: Props) {
   return (
     <>
       <div className="flex flex-col w-full">
-        <div className="flex flex-col md:flex-row items-start md:items-center md:justify-between">
-          <div className="w-full md:w-60">
+        <div className="flex flex-col-reverse  md:flex-row items-start md:items-center md:justify-between">
+          <div className="w-full md:w-60 mt-5 md:mt-0">
             <SelectCategory
               value={categoryId}
               onChange={setCategoryId}
@@ -86,9 +105,9 @@ export default function Products({}: Props) {
           </div>
           <Button
             label="Tambah Produk"
-            className="w-full md:w-min mt-5 md:mt-0 whitespace-nowrap"
+            className="w-full md:w-min whitespace-nowrap"
             type="button"
-            onClick={() => setProductDialogVisible(true)}
+            onClick={onNewProduct}
           />
         </div>
         <div className="mt-8 overflow-x-auto w-full">
@@ -105,25 +124,26 @@ export default function Products({}: Props) {
             <table className="table table-hover w-full">
               <thead>
                 <tr>
-                  <th className="w-10 md:w-12 text-center">No.</th>
-                  <th>Nama Produk</th>
+                  <th>Produk</th>
                   <th className="text-right hidden md:table-cell">Harga</th>
                   <th className="text-left w-32 hidden md:table-cell">
                     Satuan
                   </th>
                   <th>Tersedia</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>
                 {products.map((p, idx) => (
                   <tr key={p.id} className={p.isAvailable ? '' : 'disabled'}>
-                    <td className="text-center">{idx + 1}</td>
                     <td>
                       <div className="flex flex-col">
                         <div>{p.name}</div>
-                        <div className="md:hidden text-slate-500">
+                        <div className="md:hidden text-slate-600 text-sm">
                           Rp {currency(p.price)}
-                          <span className="text-xs">/{p.unit}</span>
+                          <span className="text-xs text-slate-500">
+                            /{p.unit}
+                          </span>
                         </div>
                       </div>
                     </td>
@@ -142,20 +162,35 @@ export default function Products({}: Props) {
                           }
                           className={classNames(
                             p.isAvailable ? 'bg-green-500 ' : 'bg-gray-300',
-                            'relative inline-flex h-[34px] w-[70px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75'
+                            'relative inline-flex h-[30px] w-[63px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75'
                           )}
                         >
                           <span className="sr-only">Use setting</span>
                           <span
                             aria-hidden="true"
                             className={classNames(
-                              p.isAvailable
-                                ? 'translate-x-9 '
-                                : 'translate-x-0 ',
-                              'bg-white pointer-events-none inline-block h-[30px] w-[30px] transform rounded-full  shadow-lg ring-0 transition duration-200 ease-in-out'
+                              p.isAvailable ? 'translate-x-8' : 'translate-x-0',
+                              'bg-white pointer-events-none inline-block h-[26px] w-[26px] transform rounded-full  shadow-lg ring-0 transition duration-200 ease-in-out'
                             )}
                           />
                         </Switch>
+                      </div>
+                    </td>
+                    <td className="text-center w-8">
+                      <div className="flex items-center justify-center w-min">
+                        <button
+                          className="mr-3"
+                          onClick={() => onEditProduct(p)}
+                          type="button"
+                        >
+                          <PencilIcon className="w-4 h-4 text-slate-600" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDeleteProduct(p)}
+                        >
+                          <TrashIcon className="w-4 h-4 text-red-600" />
+                        </button>
                       </div>
                     </td>
                   </tr>
@@ -168,6 +203,11 @@ export default function Products({}: Props) {
       <AddProductDialog
         visible={productDialogVisible}
         onDismiss={() => setProductDialogVisible(false)}
+        initialValues={editProduct}
+      />
+      <DeleteProductDialog
+        product={deleteProduct}
+        onDismiss={() => setDeleteProduct(undefined)}
       />
     </>
   );

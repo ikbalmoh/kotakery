@@ -2,11 +2,11 @@ import Button from '@/components/Button';
 import { classNames } from '@/utils/helpers';
 import { Dialog, Transition } from '@headlessui/react';
 import { useFormik } from 'formik';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import * as yup from 'yup';
 import Cleave from 'cleave.js/react';
 import SelectUnit from './SelectUnit';
-import { storeProduct } from '@/firebase/db/product';
+import { storeProduct, updateProduct } from '@/firebase/db/product';
 import Product from '@/@types/product';
 import toast from 'react-hot-toast';
 import SelectCategory from './SelectCategory';
@@ -14,19 +14,26 @@ import SelectCategory from './SelectCategory';
 type Props = {
   visible: boolean;
   onDismiss: () => void;
+  initialValues?: Product;
 };
 
-export default function AddProductDialog({ visible, onDismiss }: Props) {
+export default function AddProductDialog({
+  visible,
+  onDismiss,
+  initialValues,
+}: Props) {
   const [loading, setLoading] = useState<boolean>(false);
 
   const form = useFormik({
-    initialValues: {
-      name: '',
-      categoryId: '',
-      description: '',
-      price: undefined,
-      unit: '',
-    },
+    initialValues: initialValues
+      ? initialValues
+      : {
+          name: '',
+          categoryId: '',
+          description: '',
+          price: undefined,
+          unit: '',
+        },
     validationSchema: yup.object({
       name: yup.string().required('isi nama produk'),
       categoryId: yup.string().required('pilih etalase'),
@@ -49,6 +56,23 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
     },
   });
 
+  useEffect(() => {
+    form.resetForm();
+
+    if (initialValues) {
+      form.setValues(initialValues);
+    } else {
+      form.setValues({
+        name: '',
+        categoryId: '',
+        description: '',
+        price: undefined,
+        unit: '',
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible, initialValues]);
+
   const onClose = () => {
     if (loading) {
       return;
@@ -61,11 +85,19 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
   const submitProduct = async (product: Product) => {
     setLoading(true);
     try {
-      await storeProduct(product);
+      if (initialValues) {
+        await updateProduct(initialValues.id!, product);
+        toast.success('Produk berhasil diperbaharui');
+      } else {
+        await storeProduct(product);
+        toast.success('Produk berhasil disimpan');
+      }
       setLoading(false);
       onClose();
-      toast.success('Produk berhasil disimpan');
     } catch (error) {
+      setLoading(false);
+      console.error(error);
+
       toast.error('Produk gagal disimpan');
     }
   };
@@ -102,7 +134,7 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
                     as="h3"
                     className="text-lg font-medium leading-6 text-gray-900"
                   >
-                    Tambah Produk
+                    {initialValues !== undefined ? 'Edit' : 'Tambah'} Produk
                   </Dialog.Title>
                   <div className="mt-5 grid grid-cols-12 gap-3">
                     <div className="col-span-12 flex flex-col">
@@ -224,7 +256,13 @@ export default function AddProductDialog({ visible, onDismiss }: Props) {
                       className="btn-transparent mr-3"
                       onClick={onClose}
                     />
-                    <Button loading={loading} label="Simpan" type="submit" />
+                    <Button
+                      loading={loading}
+                      label={
+                        initialValues == undefined ? 'Simpan' : 'Perbaharui'
+                      }
+                      type="submit"
+                    />
                   </div>
                 </form>
               </Dialog.Panel>

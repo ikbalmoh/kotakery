@@ -85,14 +85,21 @@ export default function SelectCategory({
   }, [user]);
 
   useEffect(() => {
+    let selected: Category | null = null;
+
     if (value) {
-      const _cat = categories.find((c) => c.id === value);
-      setCategory(_cat ?? null);
-    } else {
-      setCategory(nullable ? defaultCategory : null);
+      const cat = categories.find((c) => c.id === value);
+      if (cat) {
+        selected = cat;
+      }
+    } else if (nullable) {
+      selected = defaultCategory;
     }
+    setCategory(selected);
+
+    console.log('categoryId', { value, selected });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [value]);
+  }, [categories, value]);
 
   const handleChange = async (value: Category) => {
     if (value?.id === 'new') {
@@ -115,6 +122,7 @@ export default function SelectCategory({
               placeholder={
                 allowAdd ? 'Pilih atau buat etalase baru' : 'Pilih etalase'
               }
+              autoFocus={false}
             />
             <Combobox.Button className="absolute inset-y-0 right-0 flex items-center pr-2">
               <ChevronUpDownIcon

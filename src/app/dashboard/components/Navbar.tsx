@@ -8,6 +8,8 @@ import {
   BuildingStorefrontIcon,
   AdjustmentsVerticalIcon,
   ArrowRightOnRectangleIcon,
+  LinkIcon,
+  ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
 import { Fragment, useContext, useState } from 'react';
 import { classNames } from '@/utils/helpers';
@@ -81,12 +83,30 @@ export default function Navbar() {
                 <div className="py-1">
                   <Menu.Item>
                     {({ active }) => (
+                      <a
+                        href={`/${merchant?.username}`}
+                        target="_blank"
+                        className={classNames(
+                          active
+                            ? 'bg-gray-100 text-gray-900'
+                            : 'text-gray-700',
+                          'w-full px-4 py-2 text-left text-sm flex items-center'
+                        )}
+                      >
+                        <BuildingStorefrontIcon className="w-5 h-5 mr-3" />
+                        <span className="flex-1">Halaman Toko</span>
+                        <ArrowTopRightOnSquareIcon className="w-4 h-4 ml-3 text-slate-400" />
+                      </a>
+                    )}
+                  </Menu.Item>
+                  <Menu.Item>
+                    {({ active }) => (
                       <button
                         className={classNames(
                           active
                             ? 'text-gray-300 bg-gray-50 cursor-not-allowed'
                             : 'text-gray-400',
-                          'px-4 py-2 text-sm flex items-center w-full'
+                          'px-4 py-2 text-sm flex items-center w-full border-b border-slate-200/50'
                         )}
                       >
                         <AdjustmentsVerticalIcon className="w-5 h-5 mr-3" />

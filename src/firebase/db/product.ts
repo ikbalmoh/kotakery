@@ -5,6 +5,7 @@ import {
   Timestamp,
   addDoc,
   collection,
+  deleteDoc,
   doc,
   getCountFromServer,
   getDoc,
@@ -47,6 +48,21 @@ export const storeProduct = async (product: Product) => {
   const productRef = await addDoc(collection(db, 'products'), product);
   return productRef;
 };
+
+export const updateProduct = async (id: string, product: Product) => {
+  const productRef = await updateDoc(doc(db, 'products', id), {
+    name: product.name,
+    categoryId: product.categoryId,
+    price: product.price,
+    unit: product.unit,
+    description: product.description ?? '',
+    updatedAt: Timestamp.fromDate(new Date()),
+  });
+  return productRef;
+};
+
+export const deleteProduct = async (id: string) =>
+  deleteDoc(doc(db, 'products', id));
 
 export const storeCategory = async (name: string) => {
   const uid = getCookie('uid');
