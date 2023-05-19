@@ -73,7 +73,9 @@ export const getMerchantAccount = async (uid: string) => {
 
 export const getMerchantByUsername = async (username: string) => {
   try {
-    const merchantRef = collection(db, 'merchants');
+    const merchantRef = collection(db, 'merchants').withConverter(
+      merchantAccountConverter
+    );
     const q = query(merchantRef, where('username', '==', username));
 
     const querySnapshot = await getDocs(q);

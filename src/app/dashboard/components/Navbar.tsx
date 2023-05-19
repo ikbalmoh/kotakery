@@ -48,7 +48,7 @@ export default function Navbar() {
               src={'/icons/icon.png'}
               width={24}
               height={24}
-              alt="icon"
+              alt="kotakery"
               className="mr-1"
             />
             <span>Kotakery</span>

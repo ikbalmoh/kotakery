@@ -15,7 +15,7 @@ import {
   where,
 } from 'firebase/firestore';
 import db from './db';
-import Category from '@/@types/category';
+import Category, { categoryConverter } from '@/@types/category';
 
 export const getSummaries = async () => {
   const uid = getCookie('uid');
@@ -93,10 +93,36 @@ export const getCategory = async (uid: string) => {
   }
 };
 
-export const merchantProducts = async (categoryId?: string | null) => {
+export const merchantCategories = async (uid: string) => {
   try {
-    const uid = getCookie('uid');
+    const categories: Array<Category> = [];
 
+    const q = query(
+      collection(db, 'categories').withConverter(categoryConverter),
+      where('merchantId', '==', uid)
+    );
+
+    const querySnapshot = await getDocs(q);
+
+    querySnapshot.forEach((doc) => {
+      const category: Category = doc.data();
+      category.id = doc.id;
+
+      categories.push(category);
+    });
+
+    return categories;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const merchantProducts = async (
+  uid: string,
+  categoryId?: string | null
+) => {
+  try {
     const products: Array<Product> = [];
 
     const whereQuery: Array<QueryConstraint> = [where('merchantId', '==', uid)];
@@ -106,7 +132,7 @@ export const merchantProducts = async (categoryId?: string | null) => {
     }
 
     const q = query(
-      collection(db, 'products').withConverter<Product>(productConverter),
+      collection(db, 'products').withConverter(productConverter),
       ...whereQuery
     );
 

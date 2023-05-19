@@ -4,7 +4,6 @@ import { User } from '@firebase/auth';
 import { useRouter } from 'next/navigation';
 import MerchantAccount from '@/@types/account';
 import { getMerchantAccount } from '@/firebase/db/account';
-import { DocumentData } from 'firebase/firestore';
 
 export interface AuthContextType {
   user: User | null;

@@ -6,6 +6,7 @@ import {
 } from 'firebase/firestore';
 
 export interface MerchantData {
+  id?: string;
   name?: string;
   username?: string;
   address?: string;
@@ -36,13 +37,14 @@ export const merchantAccountConverter = {
   ): MerchantAccount {
     const data = snapshot.data(options)!;
     return {
+      id: snapshot.id,
       name: data.name,
       username: data.username,
       address: data.address,
       phone: data.phone,
       owner: data.owner,
-      lastActivity: data.lastActivity,
-      joinedAt: data.joinedAt,
+      lastActivity: data.lastActivity?.toDate(),
+      joinedAt: data.joinedAt?.toDate(),
     };
   },
 };

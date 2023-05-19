@@ -6,6 +6,7 @@ import Navbar from './components/Navbar';
 import AuthProvider from '@/contexts/auth';
 import NextTopLoader from 'nextjs-toploader';
 import { Toaster } from 'react-hot-toast';
+import Image from 'next/image';
 
 const inter = Inter({ subsets: ['latin'] });
 
