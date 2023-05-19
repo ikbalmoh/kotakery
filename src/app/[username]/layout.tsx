@@ -34,6 +34,7 @@ export default async function RootLayout({
   return (
     <html lang="en">
       <body
+        suppressHydrationWarning={true}
         className={classNames(
           inter.className,
           'mx-auto flex flex-col bg-slate-50'

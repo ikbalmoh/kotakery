@@ -1,3 +1,5 @@
+'use client';
+
 import { CartItem } from '@/@types/cart';
 import Category from '@/@types/category';
 import Product from '@/@types/product';
@@ -10,6 +12,7 @@ export interface CartContextType {
   products: Array<Product>;
   cart: Array<CartItem>;
   addToCart: (item: CartItem) => void;
+  changeQty: (id: string, qty: number | string) => void;
 }
 
 export const CartContext = createContext<CartContextType | null>(null);
@@ -46,6 +49,12 @@ export function CartContextProvider({
           .filter((c) => c.items && c.items.length > 0);
 
         setCategories(_categories);
+
+        const cartStorage = localStorage.getItem('cart');
+        if (cartStorage) {
+          setCart(JSON.parse(cartStorage));
+        }
+
         setInitializing(false);
       } catch (error) {
         setInitializing(false);
@@ -57,12 +66,53 @@ export function CartContextProvider({
   }, []);
 
   const addToCart = (item: CartItem) => {
-    setCart([...cart, item]);
+    const _items = [...cart, item];
+    setCart(_items);
+
+    localStorage.setItem('cart', JSON.stringify(_items));
+  };
+
+  const deleteFromCart = (id: string) =>
+    setCart(cart.filter((c) => c.id !== id));
+
+  const changeQty = (id: string, qty: number | string) => {
+    const item: CartItem | undefined = cart.find((c) => c.id === id);
+
+    if (!item) {
+      return;
+    }
+
+    let _qty = item.qty;
+    if (qty === '+') {
+      _qty++;
+    } else if (qty === '-') {
+      _qty--;
+    } else if (qty) {
+      _qty = qty as number;
+    }
+
+    if (!qty || _qty < 1) {
+      // Delete item
+      deleteFromCart(id);
+      return;
+    }
+
+    setCart(
+      cart.map((item) => {
+        if (item.id === id) {
+          return {
+            ...item,
+            qty: _qty,
+          };
+        }
+        return item;
+      })
+    );
   };
 
   return (
     <CartContext.Provider
-      value={{ initializing, categories, products, cart, addToCart }}
+      value={{ initializing, categories, products, cart, addToCart, changeQty }}
     >
       {children}
     </CartContext.Provider>
