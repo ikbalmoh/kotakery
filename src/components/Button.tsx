@@ -6,18 +6,21 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
   label: string;
   loading?: boolean;
   transparent?: boolean;
+  danger?: boolean;
 }
 
 export default function Button({
   loading,
   transparent,
+  danger,
   label,
   ...props
 }: ButtonProps) {
   let className = classNames(
     'btn',
     props.className ? props.className : '',
-    transparent ? 'btn-transparent' : ''
+    transparent ? 'btn-transparent' : '',
+    danger ? 'btn-danger' : ''
   );
 
   return (

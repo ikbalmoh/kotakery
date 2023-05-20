@@ -13,6 +13,8 @@ export interface CartContextType {
   cart: Array<CartItem>;
   addToCart: (item: CartItem) => void;
   changeQty: (id: string, qty: number | string) => void;
+  subtotal: number;
+  totalItems: number;
 }
 
 export const CartContext = createContext<CartContextType | null>(null);
@@ -110,9 +112,21 @@ export function CartContextProvider({
     );
   };
 
+  const totalItems: number = cart.reduce((a, b) => a + b.qty, 0);
+  const subtotal: number = cart.reduce((a, b) => a + b.price * b.qty, 0);
+
   return (
     <CartContext.Provider
-      value={{ initializing, categories, products, cart, addToCart, changeQty }}
+      value={{
+        initializing,
+        categories,
+        products,
+        cart,
+        addToCart,
+        changeQty,
+        subtotal,
+        totalItems,
+      }}
     >
       {children}
     </CartContext.Provider>
