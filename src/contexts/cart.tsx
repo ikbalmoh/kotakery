@@ -1,17 +1,19 @@
 'use client';
 
+import MerchantAccount from '@/@types/account';
 import { CartItem } from '@/@types/cart';
-import Category from '@/@types/category';
-import Product from '@/@types/product';
-import { merchantCategories, merchantProducts } from '@/firebase/db/product';
 import { createContext, useState, useEffect } from 'react';
 
+interface OrderForm {
+  name: string;
+  phoneNumber: string;
+  address: string;
+  paymentMethod: string;
+}
 export interface CartContextType {
-  initializing: boolean;
-  categories: Array<Category>;
-  products: Array<Product>;
   cart: Array<CartItem>;
   addToCart: (item: CartItem) => void;
+  checkout: (values: OrderForm) => void;
   changeQty: (id: string, qty: number | string) => void;
   subtotal: number;
   totalItems: number;
@@ -20,50 +22,19 @@ export interface CartContextType {
 export const CartContext = createContext<CartContextType | null>(null);
 
 export function CartContextProvider({
-  id,
+  merchant,
   children,
 }: {
-  id: string;
+  merchant: MerchantAccount;
   children: React.ReactNode;
 }) {
-  const [categories, setCategories] = useState<Array<Category>>([]);
-  const [products, setProducts] = useState<Array<Product>>([]);
-  const [initializing, setInitializing] = useState<boolean>(true);
-
   const [cart, setCart] = useState<Array<CartItem>>([]);
 
   useEffect(() => {
-    const loadProducts = async () => {
-      try {
-        const _products = await merchantProducts(id);
-        setProducts(_products);
-
-        let _categories = await merchantCategories(id);
-
-        _categories = _categories
-          .map((category) => {
-            const _productCategories = _products.filter(
-              (p) => p.categoryId === category.id
-            );
-            category.items = _productCategories;
-            return category;
-          })
-          .filter((c) => c.items && c.items.length > 0);
-
-        setCategories(_categories);
-
-        const cartStorage = localStorage.getItem('cart');
-        if (cartStorage) {
-          setCart(JSON.parse(cartStorage));
-        }
-
-        setInitializing(false);
-      } catch (error) {
-        setInitializing(false);
-      }
-    };
-
-    loadProducts();
+    const cartStorage = localStorage.getItem('cart');
+    if (cartStorage) {
+      setCart(JSON.parse(cartStorage));
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -112,20 +83,35 @@ export function CartContextProvider({
     );
   };
 
+  const checkout = (orderForm: OrderForm) => {
+    let message: string = `Halo *${merchant.name}*\n\n`;
+    message += 'Saya mau order dengan rincian sebagai berikut:\n';
+    message += `Nama: *${orderForm.name}*\n`;
+    message += `No. WA: *${orderForm.phoneNumber}*\n`;
+    message += `Alamat Pengiriman: *${orderForm.address}*\n`;
+    message += `Pembayaran: *${orderForm.paymentMethod}*\n\n`;
+    message += `Dafar pesanan:\n`;
+    cart.forEach((item) => {
+      message += `*${item.qty}* x ${item.name} (${item.unit})\n`;
+    });
+    message = encodeURIComponent(message);
+    const phoneNumber: string = merchant.phone!.replace('+', '');
+    let url = `https://wa.me/${phoneNumber}?text=${message}`;
+    window.open(url, '_blank');
+  };
+
   const totalItems: number = cart.reduce((a, b) => a + b.qty, 0);
   const subtotal: number = cart.reduce((a, b) => a + b.price * b.qty, 0);
 
   return (
     <CartContext.Provider
       value={{
-        initializing,
-        categories,
-        products,
         cart,
         addToCart,
         changeQty,
         subtotal,
         totalItems,
+        checkout,
       }}
     >
       {children}

@@ -4,6 +4,7 @@ export interface CartItem {
   price: number;
   qty: number;
   note?: string;
+  unit: string;
 }
 
 export interface Customer {

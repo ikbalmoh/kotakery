@@ -8,21 +8,21 @@ import { CartItem } from '@/@types/cart';
 import { classNames } from '@/utils/helpers';
 import Button from '@/components/Button';
 import Cart from './Cart';
+import QtyButton from './QtyButton';
+import { ProductContext, ProductContextType } from '@/contexts/product';
 
 type Props = {};
 
 export default function Products({}: Props) {
   const [cartVisible, setCartVisible] = useState<boolean>(false);
 
-  const {
-    categories,
-    initializing,
-    addToCart,
-    cart,
-    changeQty,
-    totalItems,
-    subtotal,
-  } = useContext(CartContext) as CartContextType;
+  const { initializing, categories } = useContext(
+    ProductContext
+  ) as ProductContextType;
+
+  const { addToCart, cart, changeQty, totalItems, subtotal } = useContext(
+    CartContext
+  ) as CartContextType;
 
   const onAddToCart = (product: Product) => {
     const item: CartItem = {
@@ -30,6 +30,7 @@ export default function Products({}: Props) {
       name: product.name,
       price: product.price,
       qty: 1,
+      unit: product.unit,
     };
     addToCart(item);
   };
@@ -74,31 +75,11 @@ export default function Products({}: Props) {
                   </div>
                   <div className="flex items-center justify-end mt-5">
                     {onCart(product.id!) ? (
-                      <div className="rounded-md shadow-md border border-red-600 h-8 flex items-center font-medium bg-white">
-                        <button
-                          className="pl-3 pr-1 text-red-600 h-full text-base"
-                          onClick={() => changeQty(product.id!, '-')}
-                        >
-                          -
-                        </button>
-                        <input
-                          type="text"
-                          value={onCart(product.id!)?.qty}
-                          onChange={(e) =>
-                            changeQty(
-                              product.id!,
-                              e.target.value ? parseInt(e.target.value) : 1
-                            )
-                          }
-                          className="px-3 text-xs outline-none w-10 text-center"
-                        />
-                        <button
-                          className="pr-3 pk-1 text-red-600 h-full text-base"
-                          onClick={() => changeQty(product.id!, '+')}
-                        >
-                          +
-                        </button>
-                      </div>
+                      <QtyButton
+                        id={product.id!}
+                        qty={onCart(product.id!)?.qty!}
+                        onChange={changeQty}
+                      />
                     ) : (
                       <button
                         type="button"
