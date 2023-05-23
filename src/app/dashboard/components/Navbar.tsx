@@ -1,40 +1,24 @@
 'use client';
 
-import { signOut } from '@/firebase/auth';
 import Link from 'next/link';
-import { Menu, Transition, Dialog } from '@headlessui/react';
+import { Menu, Transition } from '@headlessui/react';
 import {
   ChevronDownIcon,
   BuildingStorefrontIcon,
   AdjustmentsVerticalIcon,
   ArrowRightOnRectangleIcon,
-  LinkIcon,
   ArrowTopRightOnSquareIcon,
 } from '@heroicons/react/24/outline';
 import { Fragment, useContext, useState } from 'react';
 import { classNames } from '@/utils/helpers';
 import { AuthContext, AuthContextType } from '@/contexts/auth';
-import Button from '@/components/Button';
 import Image from 'next/image';
+import ConfirmSignout from './ConfirmSignout';
 
 export default function Navbar() {
-  const { merchant, user } = useContext(AuthContext) as AuthContextType;
+  const { merchant } = useContext(AuthContext) as AuthContextType;
 
   const [signOutVisible, setSignOutVisible] = useState<boolean>(false);
-  const [signingOut, setSigningOut] = useState<boolean>(false);
-
-  const closeSignoutDialog = () => {
-    if (!signingOut) {
-      setSignOutVisible(false);
-    }
-  };
-
-  const onSignout = async () => {
-    if (user) {
-      signOut(user.uid);
-      setSigningOut(true);
-    }
-  };
 
   return (
     <>
@@ -137,67 +121,10 @@ export default function Navbar() {
           </Menu>
         </div>
       </nav>
-      <Transition appear show={signOutVisible} as={Fragment}>
-        <Dialog as="div" className="relative z-10" onClose={closeSignoutDialog}>
-          <Transition.Child
-            as={Fragment}
-            enter="ease-out duration-300"
-            enterFrom="opacity-0"
-            enterTo="opacity-100"
-            leave="ease-in duration-200"
-            leaveFrom="opacity-100"
-            leaveTo="opacity-0"
-          >
-            <div className="fixed inset-0 bg-black bg-opacity-25" />
-          </Transition.Child>
-
-          <div className="fixed inset-0 overflow-y-auto">
-            <div className="flex min-h-full items-center justify-center p-4 text-center">
-              <Transition.Child
-                as={Fragment}
-                enter="ease-out duration-300"
-                enterFrom="opacity-0 scale-95"
-                enterTo="opacity-100 scale-100"
-                leave="ease-in duration-200"
-                leaveFrom="opacity-100 scale-100"
-                leaveTo="opacity-0 scale-95"
-              >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-6 text-left align-middle shadow-xl transition-all">
-                  <Dialog.Title
-                    as="h3"
-                    className="text-lg font-medium leading-6 text-gray-900"
-                  >
-                    Apakah Anda Ingin Keluar?
-                  </Dialog.Title>
-                  <div className="mt-2">
-                    <p className="text-sm text-gray-500">
-                      Anda bisa masuk ke akun Anda kembali nanti
-                    </p>
-                  </div>
-
-                  <div className="mt-8 flex items-center justify-end">
-                    {!signingOut && (
-                      <Button
-                        label="Tidak"
-                        type="button"
-                        className="btn-transparent mr-3"
-                        onClick={closeSignoutDialog}
-                      />
-                    )}
-                    <Button
-                      loading={signingOut}
-                      label="Keluar"
-                      className="bg-red-100 text-red-600"
-                      type="button"
-                      onClick={onSignout}
-                    />
-                  </div>
-                </Dialog.Panel>
-              </Transition.Child>
-            </div>
-          </div>
-        </Dialog>
-      </Transition>
+      <ConfirmSignout
+        visible={signOutVisible}
+        onDismiss={() => setSignOutVisible(false)}
+      />
     </>
   );
 }

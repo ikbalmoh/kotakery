@@ -17,6 +17,7 @@
     "autoprefixer": "10.4.14",
     "cleave.js": "^1.6.0",
     "cookies-next": "^2.1.1",
+    "debounce": "^1.2.1",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.1",
     "firebase": "^9.21.0",
