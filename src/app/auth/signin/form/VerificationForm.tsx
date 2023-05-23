@@ -77,7 +77,7 @@ export default function VerificationForm({
             }}
             type="text"
             className={`form-input intro-y ${
-              verifyForm.errors.code ? 'error' : ''
+              verifyForm.touched.code && verifyForm.errors.code ? 'error' : ''
             }`}
             name="code"
             onChange={(e) =>

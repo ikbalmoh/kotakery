@@ -5,6 +5,7 @@ import { Inter } from 'next/font/google';
 import NextTopLoader from 'nextjs-toploader';
 
 import '@/app/globals.css';
+import { Toaster } from 'react-hot-toast';
 const inter = Inter({ subsets: ['latin'] });
 
 export default function RootLayout({
@@ -35,6 +36,7 @@ export default function RootLayout({
               );
             }}
           </RecaptchaContext.Consumer>
+          <Toaster toastOptions={{ duration: 3000 }} />
         </body>
       </html>
     </RecaptchaProvider>

@@ -74,7 +74,7 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
     const username: string = name
       .toLowerCase()
       .trim()
-      .replaceAll(' ', '')
+      .replace(/\s+/g, '')
       .replace(/[^a-zA-Z0-9]/g, '');
     form.setFieldValue('username', username);
   };

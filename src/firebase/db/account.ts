@@ -17,9 +17,10 @@ import { MERCHANT_DB } from './const';
 
 export const isPhoneNumberRegistered = async (phoneNumber: string) => {
   const merchantRef = collection(db, MERCHANT_DB);
+
   const q = query(
     merchantRef,
-    where('owner.phone', '==', phoneNumber),
+    where('owner.phone', '==', phoneNumber.replace(/\s+/g, '')),
     limit(1)
   );
 

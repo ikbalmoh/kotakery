@@ -10,6 +10,7 @@ import { ConfirmationResult } from 'firebase/auth';
 import { requestVerificationCode } from '@/firebase/auth';
 import Button from '@/components/Button';
 import { isPhoneNumberRegistered } from '@/firebase/db/account';
+import { toast } from 'react-hot-toast';
 
 type Props = {
   onSubmit: ({
@@ -48,7 +49,7 @@ export default function AccountForm({
         resetRecaptcha();
       }
       const result: ConfirmationResult = await requestVerificationCode(
-        values.phone!.replaceAll(' ', ''),
+        values.phone!.replace(/\s+/g, ''),
         recaptcha!
       );
       onSubmit({
@@ -56,6 +57,9 @@ export default function AccountForm({
         confirmationResult: result,
       });
     } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
       console.error(error);
     }
   };

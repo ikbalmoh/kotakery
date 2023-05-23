@@ -38,7 +38,11 @@ export async function requestVerificationCode(
   appVerifier: RecaptchaVerifier
 ) {
   try {
-    const result = await signInWithPhoneNumber(auth, phoneNumber, appVerifier);
+    const result = await signInWithPhoneNumber(
+      auth,
+      phoneNumber.replace(/\s+/g, ''),
+      appVerifier
+    );
     return result;
   } catch (error) {
     throw error;
@@ -63,8 +67,8 @@ export const registerMerchant = async (
   confirmationResult: ConfirmationResult
 ) => {
   try {
-    merchant.phone = merchant.phone?.replaceAll(' ', '');
-    merchant.owner.phone = merchant.owner.phone?.replaceAll(' ', '');
+    merchant.phone = merchant.phone?.replace(/\s+/g, '');
+    merchant.owner.phone = merchant.owner.phone?.replace(/\s+/g, '');
 
     const authenticatedUser: User = await verifyVerificationCode(
       code,

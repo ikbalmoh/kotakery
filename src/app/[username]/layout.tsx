@@ -43,7 +43,7 @@ export default async function RootLayout({
       >
         <NextTopLoader color="#f75728" />
         {children}
-        <Toaster toastOptions={{ duration: 1000 }} />
+        <Toaster toastOptions={{ duration: 3000 }} />
       </body>
     </html>
   );
