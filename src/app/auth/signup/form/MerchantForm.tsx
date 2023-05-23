@@ -163,6 +163,7 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
           Untuk menerima pesanan dari pelanggan
         </span>
         <Cleave
+          type="tel"
           options={{
             phone: true,
             phoneRegionCode: 'ID',

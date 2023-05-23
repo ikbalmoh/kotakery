@@ -117,6 +117,7 @@ export default function AccountForm({
           Akan digunakan untuk aktivasi dan login. Pastikan nomor anda aktif
         </span>
         <Cleave
+          type="tel"
           options={{
             phone: true,
             phoneRegionCode: 'ID',

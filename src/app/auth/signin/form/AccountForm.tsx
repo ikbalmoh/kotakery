@@ -79,6 +79,7 @@ export default function AccountForm({ onSubmit }: Props) {
             Nomor Telepon
           </label>
           <Cleave
+            type="tel"
             options={{
               phone: true,
               phoneRegionCode: 'ID',
