@@ -56,16 +56,25 @@ export default function Cart({ isOpen, onDismiss }: Props) {
 
   useEffect(() => {
     const onFormInvalid = () => {
-      toast.error('Silahkan lengkapi form pemesanan', {
-        position: 'top-center',
-      });
-      formRef.current?.scrollIntoView();
+      if (
+        form.touched.name &&
+        form.errors.name &&
+        form.touched.address &&
+        form.errors.address &&
+        form.touched.phoneNumber &&
+        form.errors.phoneNumber
+      ) {
+        toast.error('Silahkan lengkapi form pemesanan', {
+          position: 'top-center',
+        });
+        formRef.current?.scrollIntoView();
+      }
     };
     if (!form.isValid) {
       toast.remove();
       onFormInvalid();
     }
-  }, [form.isValid, form.isSubmitting]);
+  }, [form.isValid, form.isSubmitting, form.touched, form.errors]);
 
   return (
     <>
@@ -164,14 +173,14 @@ export default function Cart({ isOpen, onDismiss }: Props) {
                           type="text"
                           className={classNames(
                             `form-input `,
-                            form.errors.name ? 'error' : ''
+                            form.touched.name && form.errors.name ? 'error' : ''
                           )}
                           value={form.values.name}
                           onChange={form.handleChange}
                           onBlur={form.handleBlur}
                         />
                         <span className="mt-2 text-xs text-red-500 ">
-                          {form.errors.name}
+                          {form.touched.name ? form.errors.name : ''}
                         </span>
                       </div>
                       <div className="flex flex-col mb-3">
@@ -179,27 +188,29 @@ export default function Cart({ isOpen, onDismiss }: Props) {
                           Nomor Whatsapp
                         </label>
                         <Cleave
+                          type="tel"
                           options={{
                             phone: true,
                             phoneRegionCode: 'ID',
                             prefix: '+62',
                             tailPrefix: true,
-                            rawValueTrimPrefix: false,
                           }}
                           className={classNames(
                             `form-input `,
-                            form.errors.phoneNumber ? 'error' : ''
+                            form.touched.phoneNumber && form.errors.phoneNumber
+                              ? 'error'
+                              : ''
                           )}
                           name="phoneNumber"
-                          onChange={(e) =>
-                            form.setFieldValue('phoneNumber', e.target.rawValue)
-                          }
+                          onChange={form.handleChange}
                           onBlur={form.handleBlur}
                           value={form.values.phoneNumber}
                           autoFocus
                         />
                         <span className="mt-2 text-xs text-red-500 ">
-                          {form.errors.phoneNumber}
+                          {form.touched.phoneNumber
+                            ? form.errors.phoneNumber
+                            : ''}
                         </span>
                       </div>
                       <div className="flex flex-col mb-3">
@@ -210,14 +221,16 @@ export default function Cart({ isOpen, onDismiss }: Props) {
                           name="address"
                           className={classNames(
                             `form-input `,
-                            form.errors.address ? 'error' : ''
+                            form.touched.address && form.errors.address
+                              ? 'error'
+                              : ''
                           )}
                           value={form.values.address}
                           onChange={form.handleChange}
                           onBlur={form.handleBlur}
                         ></textarea>
                         <span className="mt-2 text-xs text-red-500 ">
-                          {form.errors.address}
+                          {form.touched.address ? form.errors.address : ''}
                         </span>
                       </div>
                       <div className="flex flex-col mb-3">
@@ -250,6 +263,11 @@ export default function Cart({ isOpen, onDismiss }: Props) {
                             <span className="mx-2">COD</span>
                           </label>
                         </div>
+                        <span className="mt-2 text-xs text-red-500 ">
+                          {form.touched.paymentMethod
+                            ? form.errors.paymentMethod
+                            : ''}
+                        </span>
                         <span className="text-xs text-slate-500 mt-2">
                           Perhitungan total dengan ongkir akan diinfokan kembali
                           via Whatsapp
