@@ -91,7 +91,7 @@ export default function AccountForm({ onSubmit }: Props) {
               form.errors.phone ? 'error' : ''
             )}
             name="phone"
-            onChange={(e) => form.setFieldValue('phone', e.target.rawValue)}
+            onChange={form.handleChange}
             onBlur={form.handleBlur}
             value={form.values.phone}
             disabled={loading}

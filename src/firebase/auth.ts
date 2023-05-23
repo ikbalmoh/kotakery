@@ -63,6 +63,9 @@ export const registerMerchant = async (
   confirmationResult: ConfirmationResult
 ) => {
   try {
+    merchant.phone = merchant.phone?.replaceAll(' ', '');
+    merchant.owner.phone = merchant.owner.phone?.replaceAll(' ', '');
+
     const authenticatedUser: User = await verifyVerificationCode(
       code,
       confirmationResult

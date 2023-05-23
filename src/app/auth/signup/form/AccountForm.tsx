@@ -48,7 +48,7 @@ export default function AccountForm({
         resetRecaptcha();
       }
       const result: ConfirmationResult = await requestVerificationCode(
-        values.phone!,
+        values.phone!.replaceAll(' ', ''),
         recaptcha!
       );
       onSubmit({
@@ -128,7 +128,7 @@ export default function AccountForm({
             'form-input intro-y',
             form.touched.phone && form.errors.phone ? 'error' : ''
           )}
-          onChange={(e) => form.setFieldValue('phone', e.target.rawValue)}
+          onChange={form.handleChange}
           name="phone"
           onBlur={form.handleBlur}
           value={form.values.phone}

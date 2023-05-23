@@ -194,6 +194,7 @@ export default function Cart({ isOpen, onDismiss }: Props) {
                             phoneRegionCode: 'ID',
                             prefix: '+62',
                             tailPrefix: true,
+                            rawValueTrimPrefix: false,
                           }}
                           className={classNames(
                             `form-input `,
