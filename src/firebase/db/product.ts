@@ -16,18 +16,19 @@ import {
 } from 'firebase/firestore';
 import db from './db';
 import Category, { categoryConverter } from '@/@types/category';
+import { CATEGORY_DB, PRODUCT_DB } from './const';
 
 export const getSummaries = async () => {
   const uid = getCookie('uid');
 
   const categoryQ = query(
-    collection(db, 'categories'),
+    collection(db, CATEGORY_DB),
     where('merchantId', '==', uid)
   );
   const categorySnapshot = await getCountFromServer(categoryQ);
 
   const productQ = query(
-    collection(db, 'products'),
+    collection(db, PRODUCT_DB),
     where('merchantId', '==', uid)
   );
   const productSnapshot = await getCountFromServer(productQ);
@@ -45,12 +46,12 @@ export const storeProduct = async (product: Product) => {
   product.updatedAt = null;
   product.isAvailable = true;
 
-  const productRef = await addDoc(collection(db, 'products'), product);
+  const productRef = await addDoc(collection(db, PRODUCT_DB), product);
   return productRef;
 };
 
 export const updateProduct = async (id: string, product: Product) => {
-  const productRef = await updateDoc(doc(db, 'products', id), {
+  const productRef = await updateDoc(doc(db, PRODUCT_DB, id), {
     name: product.name,
     categoryId: product.categoryId,
     price: product.price,
@@ -62,7 +63,7 @@ export const updateProduct = async (id: string, product: Product) => {
 };
 
 export const deleteProduct = async (id: string) =>
-  deleteDoc(doc(db, 'products', id));
+  deleteDoc(doc(db, PRODUCT_DB, id));
 
 export const storeCategory = async (name: string) => {
   const uid = getCookie('uid');
@@ -72,7 +73,7 @@ export const storeCategory = async (name: string) => {
     merchantId: uid?.toString(),
   };
 
-  const categoryRef = await addDoc(collection(db, 'categories'), category);
+  const categoryRef = await addDoc(collection(db, CATEGORY_DB), category);
   return categoryRef.id;
 };
 
@@ -98,7 +99,7 @@ export const merchantCategories = async (uid: string) => {
     const categories: Array<Category> = [];
 
     const q = query(
-      collection(db, 'categories').withConverter(categoryConverter),
+      collection(db, CATEGORY_DB).withConverter(categoryConverter),
       where('merchantId', '==', uid)
     );
 
@@ -132,7 +133,7 @@ export const merchantProducts = async (
     }
 
     const q = query(
-      collection(db, 'products').withConverter(productConverter),
+      collection(db, PRODUCT_DB).withConverter(productConverter),
       ...whereQuery
     );
 
@@ -156,7 +157,7 @@ export const updateProductAvailability = async (
   id: string,
   available: boolean
 ) => {
-  const productRef = doc(db, 'products', id);
+  const productRef = doc(db, PRODUCT_DB, id);
   return updateDoc(productRef, {
     isAvailable: available,
   });

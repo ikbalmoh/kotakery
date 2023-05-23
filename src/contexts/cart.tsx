@@ -1,19 +1,15 @@
 'use client';
 
 import MerchantAccount from '@/@types/account';
-import { CartItem } from '@/@types/cart';
+import { CartItem, OrderForm, Transaction } from '@/@types/cart';
+import { storeTransaction } from '@/firebase/db/transaction';
+import { Timestamp } from 'firebase/firestore';
 import { createContext, useState, useEffect } from 'react';
 
-interface OrderForm {
-  name: string;
-  phoneNumber: string;
-  address: string;
-  paymentMethod: string;
-}
 export interface CartContextType {
   cart: Array<CartItem>;
   addToCart: (item: CartItem) => void;
-  checkout: (values: OrderForm) => void;
+  checkout: (values: OrderForm) => Promise<void>;
   changeQty: (id: string, qty: number | string) => void;
   subtotal: number;
   totalItems: number;
@@ -30,6 +26,9 @@ export function CartContextProvider({
 }) {
   const [cart, setCart] = useState<Array<CartItem>>([]);
 
+  const totalItems: number = cart.reduce((a, b) => a + b.qty, 0);
+  const subtotal: number = cart.reduce((a, b) => a + b.price * b.qty, 0);
+
   useEffect(() => {
     const cartStorage = localStorage.getItem('cart');
     if (cartStorage) {
@@ -45,8 +44,11 @@ export function CartContextProvider({
     localStorage.setItem('cart', JSON.stringify(_items));
   };
 
-  const deleteFromCart = (id: string) =>
-    setCart(cart.filter((c) => c.id !== id));
+  const deleteFromCart = (id: string) => {
+    const _cart = cart.filter((c) => c.id !== id);
+    setCart(_cart);
+    localStorage.setItem('cart', JSON.stringify(_cart));
+  };
 
   const changeQty = (id: string, qty: number | string) => {
     const item: CartItem | undefined = cart.find((c) => c.id === id);
@@ -83,25 +85,25 @@ export function CartContextProvider({
     );
   };
 
-  const checkout = (orderForm: OrderForm) => {
-    let message: string = `Halo *${merchant.name}*\n\n`;
-    message += 'Saya mau order dengan rincian sebagai berikut:\n';
-    message += `Nama: *${orderForm.name}*\n`;
-    message += `No. WA: *${orderForm.phoneNumber}*\n`;
-    message += `Alamat Pengiriman: *${orderForm.address}*\n`;
-    message += `Pembayaran: *${orderForm.paymentMethod}*\n\n`;
-    message += `Dafar pesanan:\n`;
-    cart.forEach((item) => {
-      message += `*${item.qty}* x ${item.name} (${item.unit})\n`;
-    });
-    message = encodeURIComponent(message);
-    const phoneNumber: string = merchant.phone!.replace('+', '');
-    let url = `https://wa.me/${phoneNumber}?text=${message}`;
-    window.open(url, '_blank');
-  };
+  const checkout = async (orderForm: OrderForm) => {
+    try {
+      const transaction: Transaction = {
+        ...orderForm,
+        createdAt: Timestamp.fromDate(new Date()),
+        items: cart,
+        merchantId: merchant.id!,
+        total: subtotal,
+      };
 
-  const totalItems: number = cart.reduce((a, b) => a + b.qty, 0);
-  const subtotal: number = cart.reduce((a, b) => a + b.price * b.qty, 0);
+      const message: string = await storeTransaction(merchant, transaction);
+      window.open(message, '_blank');
+      setCart([]);
+      localStorage.removeItem('cart');
+      return Promise.resolve();
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  };
 
   return (
     <CartContext.Provider
