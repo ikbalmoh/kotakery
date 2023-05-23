@@ -10,6 +10,12 @@ import Button from '@/components/Button';
 import Cart from './Cart';
 import QtyButton from './QtyButton';
 import { ProductContext, ProductContextType } from '@/contexts/product';
+import { Parisienne } from 'next/font/google';
+
+const parisienne = Parisienne({
+  weight: '400',
+  subsets: ['latin'],
+});
 
 type Props = {};
 
@@ -60,7 +66,16 @@ export default function Products({}: Props) {
                 )}
                 key={product.id}
               >
-                <div className="w-full bg-gray-200 h-32 rounded-t-lg"></div>
+                <div className="w-full bg-gray-200 h-32 rounded-t-lg">
+                  <div
+                    className={classNames(
+                      'flex items-center justify-center w-full h-full text-slate-500 text-2xl truncate px-5 select-none',
+                      parisienne.className
+                    )}
+                  >
+                    {product.name.split(' ').at(0)?.slice(0, 8)}
+                  </div>
+                </div>
                 <div className="p-3">
                   <div className="font-medium text-base text-slate-800">
                     {product.name}
