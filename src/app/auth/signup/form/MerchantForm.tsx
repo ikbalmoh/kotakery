@@ -74,7 +74,7 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
     const username: string = name
       .toLowerCase()
       .trim()
-      .replaceAll(' ', '')
+      .replace(/\s+/g, '')
       .replace(/[^a-zA-Z0-9]/g, '');
     form.setFieldValue('username', username);
   };
@@ -163,6 +163,7 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
           Untuk menerima pesanan dari pelanggan
         </span>
         <Cleave
+          type="tel"
           options={{
             phone: true,
             phoneRegionCode: 'ID',
@@ -174,7 +175,7 @@ export default function MerchantForm({ onSubmit, initialValues }: Props) {
             'form-input intro-y',
             form.touched.phone && form.errors.phone ? 'error' : ''
           )}
-          onChange={(e) => form.setFieldValue('phone', e.target.rawValue)}
+          onChange={form.handleChange}
           name="phone"
           onBlur={form.handleBlur}
           value={form.values.phone}

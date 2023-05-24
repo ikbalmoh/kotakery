@@ -10,6 +10,7 @@ import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
 import { requestVerificationCode } from '@/firebase/auth';
 import Cleave from 'cleave.js/react';
 import 'cleave.js/dist/addons/cleave-phone.id';
+import { toast } from 'react-hot-toast';
 
 type Props = {
   onSubmit: ({
@@ -60,6 +61,9 @@ export default function AccountForm({ onSubmit }: Props) {
       });
       setLoading(false);
     } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
       console.error(error);
       setLoading(false);
     }
@@ -79,6 +83,7 @@ export default function AccountForm({ onSubmit }: Props) {
             Nomor Telepon
           </label>
           <Cleave
+            type="tel"
             options={{
               phone: true,
               phoneRegionCode: 'ID',
@@ -88,10 +93,10 @@ export default function AccountForm({ onSubmit }: Props) {
             }}
             className={classNames(
               `form-input intro-y`,
-              form.errors.phone ? 'error' : ''
+              form.touched.phone && form.errors.phone ? 'error' : ''
             )}
             name="phone"
-            onChange={(e) => form.setFieldValue('phone', e.target.rawValue)}
+            onChange={form.handleChange}
             onBlur={form.handleBlur}
             value={form.values.phone}
             disabled={loading}

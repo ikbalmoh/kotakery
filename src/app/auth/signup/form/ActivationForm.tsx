@@ -9,6 +9,7 @@ import { ConfirmationResult } from 'firebase/auth';
 import RecaptchaContext, { RecaptchaContextType } from '@/contexts/recaptcha';
 import { useRouter } from 'next/navigation';
 import Cleave from 'cleave.js/react';
+import { toast } from 'react-hot-toast';
 
 type Props = {
   AccountData: MerchantAccount;
@@ -35,7 +36,9 @@ export default function ActivationForm({
       await registerMerchant(AccountData, code, confirmationResult!);
       router.replace('/dashboard');
     } catch (error) {
-      console.error(error);
+      if (error instanceof Error) {
+        toast.error(error.message);
+      }
       resetRecaptcha();
       setLoading(false);
     }

@@ -2,7 +2,6 @@
 
 import { AuthContext, AuthContextType } from '@/contexts/auth';
 import db from '@/firebase/db/db';
-import { getSummaries } from '@/firebase/db/product';
 import { classNames } from '@/utils/helpers';
 import { collection, onSnapshot, query, where } from 'firebase/firestore';
 import React, { useContext, useEffect, useState } from 'react';
@@ -23,26 +22,22 @@ const summaries: Array<{ key: string; label: string; style: string }> = [
     style: 'bg-blue-50 text-blue-600',
   },
   { key: 'products', label: 'Produk', style: 'bg-green-50 text-green-600' },
-  { key: 'order', label: 'Pesanan', style: 'bg-gray-50 text-gray-400' },
+  { key: 'order', label: 'Pesanan', style: 'bg-red-50 text-red-400' },
   { key: 'visit', label: 'Kunjungan Toko', style: 'bg-gray-50 text-gray-400' },
 ];
 
 export default function Summaries({}: Props) {
   const { user } = useContext(AuthContext) as AuthContextType;
-  const [values, setValues] = useState<ValuesType>({
-    products: 0,
-    categories: 0,
-    order: 0,
-    visit: 0,
-  });
+  const [totalProducts, setTotalProducts] = useState<number>(0);
+  const [totalCategories, setTotalCategories] = useState<number>(0);
+  const [totalOrder, setTotalOrders] = useState<number>(0);
+  const [totalVisit, setTotalVisit] = useState<number>(0);
 
-  const fetchSummaries = async () => {
-    const { products, categories } = await getSummaries();
-    setValues({
-      ...values,
-      products,
-      categories,
-    });
+  const summaryTotal: { [key: string]: number } = {
+    categories: totalCategories,
+    products: totalProducts,
+    order: totalOrder,
+    visit: totalVisit,
   };
 
   useEffect(() => {
@@ -50,25 +45,28 @@ export default function Summaries({}: Props) {
       return;
     }
 
-    const productQuery = query(
-      collection(db, 'products'),
-      where('merchantId', '==', user?.uid)
-    );
-    const unsubscribeProduct = onSnapshot(productQuery, (querySnapshot) =>
-      fetchSummaries()
+    const unsubscribeProduct = onSnapshot(
+      query(collection(db, 'products'), where('merchantId', '==', user?.uid)),
+      (querySnapshot) => setTotalProducts(querySnapshot.size)
     );
 
-    const categoryQuery = query(
-      collection(db, 'categories'),
-      where('merchantId', '==', user?.uid)
+    const unsubscribeCategories = onSnapshot(
+      query(collection(db, 'categories'), where('merchantId', '==', user?.uid)),
+      (querySnapshot) => setTotalCategories(querySnapshot.size)
     );
-    const unsubscribeCategories = onSnapshot(categoryQuery, (querySnapshot) =>
-      fetchSummaries()
+
+    const unsubscribeOrders = onSnapshot(
+      query(
+        collection(db, 'transactions'),
+        where('merchantId', '==', user?.uid)
+      ),
+      (querySnapshot) => setTotalOrders(querySnapshot.size)
     );
 
     return () => {
       unsubscribeProduct();
       unsubscribeCategories();
+      unsubscribeOrders();
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -83,9 +81,7 @@ export default function Summaries({}: Props) {
             s.style
           )}
         >
-          <div className="font-bold text-3xl">
-            {values[s.key as keyof ValuesType]}
-          </div>
+          <div className="font-bold text-3xl">{summaryTotal[s.key]}</div>
           <div className="mt-3 truncate">{s.label}</div>
         </div>
       ))}
