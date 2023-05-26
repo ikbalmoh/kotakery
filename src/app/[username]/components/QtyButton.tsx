@@ -12,6 +12,7 @@ export default function QtyButton({ id, qty, onChange }: Props) {
       <button
         className="pl-3 pr-1 text-red-600 h-full text-base"
         onClick={() => onChange(id, '-')}
+        type="button"
       >
         -
       </button>
@@ -26,6 +27,7 @@ export default function QtyButton({ id, qty, onChange }: Props) {
       <button
         className="pr-3 pk-1 text-red-600 h-full text-base"
         onClick={() => onChange(id, '+')}
+        type="button"
       >
         +
       </button>
