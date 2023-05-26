@@ -10,6 +10,8 @@ import { storeProduct, updateProduct } from '@/firebase/db/product';
 import Product from '@/@types/product';
 import toast from 'react-hot-toast';
 import SelectCategory from './SelectCategory';
+import { PhotoIcon } from '@heroicons/react/24/outline';
+import ImagePicker from '@/components/ImagePicker';
 
 type Props = {
   visible: boolean;
@@ -28,6 +30,7 @@ export default function AddProductDialog({
     initialValues: initialValues
       ? initialValues
       : {
+          image: undefined,
           name: '',
           categoryId: '',
           description: '',
@@ -35,6 +38,7 @@ export default function AddProductDialog({
           unit: '',
         },
     validationSchema: yup.object({
+      image: yup.mixed(),
       name: yup.string().required('isi nama produk'),
       categoryId: yup.string().required('pilih etalase'),
       price: yup
@@ -46,6 +50,7 @@ export default function AddProductDialog({
     }),
     onSubmit: (values) => {
       const product: Product = {
+        image: values.image,
         name: values.name,
         price: values.price ?? 0,
         description: values.description,
@@ -63,6 +68,7 @@ export default function AddProductDialog({
       form.setValues(initialValues);
     } else {
       form.setValues({
+        image: undefined,
         name: '',
         categoryId: '',
         description: '',
@@ -137,6 +143,18 @@ export default function AddProductDialog({
                     {initialValues !== undefined ? 'Edit' : 'Tambah'} Produk
                   </Dialog.Title>
                   <div className="mt-5 grid grid-cols-12 gap-3">
+                    <div className="col-span-12 flex flex-col">
+                      <label htmlFor="image" className="form-label intro-y">
+                        Foto Produk
+                      </label>
+                      <ImagePicker
+                        onChange={(file) => form.setFieldValue('image', file)}
+                        image={form.values.image}
+                      />
+                      <span className="mt-2 text-xs text-red-500 intro-y">
+                        {form.touched.image ? form.errors.image : ''}
+                      </span>
+                    </div>
                     <div className="col-span-12 flex flex-col">
                       <label htmlFor="name" className="form-label intro-y">
                         Etalase Produk

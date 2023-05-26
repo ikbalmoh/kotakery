@@ -97,7 +97,6 @@ export default function SelectCategory({
     }
     setCategory(selected);
 
-    console.log('categoryId', { value, selected });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [categories, value]);
 
