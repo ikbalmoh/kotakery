@@ -1,5 +1,5 @@
-import Products from './components/sections/Products';
-import Summaries from './components/sections/Summaries';
+import Products from './components/Products';
+import Summaries from './components/Summaries';
 
 export const metadata = {
   title: 'Dashboard | Kotakery Merchant',

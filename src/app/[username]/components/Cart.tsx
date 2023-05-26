@@ -1,10 +1,6 @@
 import { Fragment, useContext, useEffect, useRef, useState } from 'react';
 import { Dialog, Transition } from '@headlessui/react';
-import {
-  XCircleIcon,
-  ChevronUpIcon,
-  ChevronDownIcon,
-} from '@heroicons/react/24/outline';
+import { XCircleIcon } from '@heroicons/react/24/outline';
 import { CartContext, CartContextType } from '@/contexts/cart';
 import QtyButton from './QtyButton';
 import { currency } from '@/utils/formater';
@@ -32,13 +28,6 @@ export default function Cart({ isOpen, onDismiss }: Props) {
 
   const formRef = useRef<HTMLElement>(null);
 
-  useEffect(() => {
-    if (cart.length < 1) {
-      onDismiss();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cart]);
-
   const form = useFormik<OrderForm>({
     initialValues: {
       name: '',
@@ -53,6 +42,13 @@ export default function Cart({ isOpen, onDismiss }: Props) {
     }),
     onSubmit: () => setConfirmCheckout(true),
   });
+
+  useEffect(() => {
+    if (cart.length < 1) {
+      onDismiss();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cart]);
 
   useEffect(() => {
     const onFormInvalid = () => {

@@ -4,11 +4,13 @@ import {
   SnapshotOptions,
   Timestamp,
 } from 'firebase/firestore';
+import { getDownloadURL } from 'firebase/storage';
 
 export default interface Product {
   id?: string;
   merchantId?: string;
   categoryId: string;
+  image?: string | File;
   name: string;
   price: number;
   unit: string;
@@ -30,6 +32,7 @@ export const productConverter = {
     const data = snapshot.data(options)!;
     return {
       id: snapshot.id,
+      image: data.image ?? undefined,
       name: data.name,
       price: data.price,
       unit: data.unit,

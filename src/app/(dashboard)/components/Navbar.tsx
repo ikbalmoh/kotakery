@@ -85,17 +85,18 @@ export default function Navbar() {
                   </Menu.Item>
                   <Menu.Item>
                     {({ active }) => (
-                      <button
+                      <a
+                        href="/settings"
                         className={classNames(
                           active
-                            ? 'text-gray-300 bg-gray-50 cursor-not-allowed'
-                            : 'text-gray-400',
+                            ? 'bg-gray-100 text-gray-900'
+                            : 'text-gray-700',
                           'px-4 py-2 text-sm flex items-center w-full border-b border-slate-200/50'
                         )}
                       >
                         <AdjustmentsVerticalIcon className="w-5 h-5 mr-3" />
                         Pengaturan Toko
-                      </button>
+                      </a>
                     )}
                   </Menu.Item>
                   <Menu.Item>

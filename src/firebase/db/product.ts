@@ -17,6 +17,7 @@ import {
 import db from './db';
 import Category, { categoryConverter } from '@/@types/category';
 import { CATEGORY_DB, PRODUCT_DB } from './const';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export const getSummaries = async () => {
   const uid = getCookie('uid');
@@ -40,26 +41,69 @@ export const getSummaries = async () => {
 };
 
 export const storeProduct = async (product: Product) => {
-  const uid = getCookie('uid');
-  product.merchantId = uid?.toString();
-  product.createdAt = Timestamp.fromDate(new Date());
-  product.updatedAt = null;
-  product.isAvailable = true;
+  try {
+    const uid = getCookie('uid');
 
-  const productRef = await addDoc(collection(db, PRODUCT_DB), product);
-  return productRef;
+    if (product.image instanceof File) {
+      const storage = getStorage();
+      const storageRef = ref(
+        storage,
+        `products/${uid?.toString()}/${product.image.name}`
+      );
+
+      await uploadBytes(storageRef, product.image, {
+        contentType: product.image.type,
+      });
+
+      product.image = await getDownloadURL(storageRef);
+    }
+
+    product.merchantId = uid?.toString();
+    product.createdAt = Timestamp.fromDate(new Date());
+    product.updatedAt = null;
+    product.isAvailable = true;
+
+    const productRef = await addDoc(collection(db, PRODUCT_DB), product);
+    return productRef;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const updateProduct = async (id: string, product: Product) => {
-  const productRef = await updateDoc(doc(db, PRODUCT_DB, id), {
-    name: product.name,
-    categoryId: product.categoryId,
-    price: product.price,
-    unit: product.unit,
-    description: product.description ?? '',
-    updatedAt: Timestamp.fromDate(new Date()),
-  });
-  return productRef;
+  try {
+    const uid = getCookie('uid');
+
+    const data: { [key: string]: any } = {
+      name: product.name,
+      categoryId: product.categoryId,
+      price: product.price,
+      unit: product.unit,
+      description: product.description ?? '',
+      updatedAt: Timestamp.fromDate(new Date()),
+    };
+
+    if (product.image instanceof File) {
+      const storage = getStorage();
+      const storageRef = ref(
+        storage,
+        `products/${uid?.toString()}/${product.image.name}`
+      );
+
+      await uploadBytes(storageRef, product.image, {
+        contentType: product.image.type,
+      });
+
+      const path: string = await getDownloadURL(storageRef);
+
+      data.image = path;
+    }
+
+    const productRef = await updateDoc(doc(db, PRODUCT_DB, id), data);
+    return productRef;
+  } catch (error) {
+    throw error;
+  }
 };
 
 export const deleteProduct = async (id: string) =>
@@ -113,6 +157,17 @@ export const merchantCategories = async (uid: string) => {
     });
 
     return categories;
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+};
+
+export const units = () => {
+  try {
+    const units: Array<string> = [];
+
+    const q = query(collection(db, PRODUCT_DB));
   } catch (error) {
     console.error(error);
     throw error;
