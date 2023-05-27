@@ -11,6 +11,7 @@ import Cart from './Cart';
 import QtyButton from './QtyButton';
 import { ProductContext, ProductContextType } from '@/contexts/product';
 import { Parisienne } from 'next/font/google';
+import ProductImage from '@/components/ProductImage';
 
 const parisienne = Parisienne({
   weight: '400',
@@ -67,28 +68,11 @@ export default function Products({}: Props) {
                 key={product.id}
               >
                 <div className="w-full bg-gray-200 h-40 rounded-t-lg relative">
-                  {product.image ? (
-                    <Image
-                      alt="image"
-                      fill
-                      className="rounded-t-lg"
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                      }}
-                      src={product.image as string}
-                    />
-                  ) : (
-                    <div
-                      className={classNames(
-                        'flex items-center justify-center w-full h-full text-slate-500 text-2xl truncate px-5 select-none',
-                        parisienne.className
-                      )}
-                    >
-                      {product.name.split(' ').at(0)?.slice(0, 8)}
-                    </div>
-                  )}
+                  <ProductImage
+                    image={product.image ? (product.image as string) : null}
+                    name={product.name}
+                    className="rounded-t-lg"
+                  />
                 </div>
                 <div className="p-3">
                   <div className="font-medium text-base text-slate-800">
