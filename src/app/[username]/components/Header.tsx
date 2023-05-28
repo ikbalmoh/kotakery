@@ -2,7 +2,7 @@ import { MerchantContext, MerchantContextType } from '@/contexts/merchant';
 import { ProductContext, ProductContextType } from '@/contexts/product';
 import { classNames } from '@/utils/helpers';
 import { useScrollspy } from '@/utils/useScrollspy';
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useRef } from 'react';
 import {
   BuildingStorefrontIcon,
   ChatBubbleOvalLeftIcon,
@@ -16,9 +16,31 @@ export default function Header({}: Props) {
   const { merchant } = useContext(MerchantContext) as MerchantContextType;
   const { categories } = useContext(ProductContext) as ProductContextType;
 
+  const categoryTabRef = useRef<HTMLDivElement>(null);
+
   const ids: string[] = categories.map((cat) => cat.slug!);
 
   const activeId = useScrollspy(ids, 100);
+
+  useEffect(() => {
+    const sticky = categoryTabRef.current?.offsetTop;
+
+    const onScroll = () => {
+      if (sticky && window.pageYOffset >= sticky) {
+        categoryTabRef.current?.classList.add('sticky-bar');
+        categoryTabRef.current?.classList.remove('rounded-b-lg');
+      } else {
+        categoryTabRef.current?.classList.add('rounded-b-lg');
+        categoryTabRef.current?.classList.remove('sticky-bar');
+      }
+    };
+
+    window.addEventListener('scroll', onScroll);
+
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+    };
+  }, []);
 
   return (
     <>
@@ -36,7 +58,10 @@ export default function Header({}: Props) {
           </div>
         </div>
       </div>
-      <div className="mx-3 md:mx-0 flex items-center overflow-x-auto sticky top-16 bg-white px-3 md:px-5 z-30 border-t border-slate-200/60 shadow-md rounded-b-lg scroll-invisible">
+      <div
+        ref={categoryTabRef}
+        className="mx-3 md:mx-0 flex items-center overflow-x-auto bg-white px-3 md:px-5 z-30 border-t border-slate-200/60 shadow-md rounded-b-lg scroll-invisible transition-all"
+      >
         {categories.map((c) => (
           <a
             href={`#${c.slug!}`}
