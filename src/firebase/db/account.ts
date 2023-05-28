@@ -29,7 +29,13 @@ export const isPhoneNumberRegistered = async (phoneNumber: string) => {
 };
 
 export const isUsernameAvailable = async (username: string) => {
-  const forbidden: Array<string> = ['kotakery', 'cart'];
+  const forbidden: Array<string> = [
+    'kotakery',
+    'cart',
+    'auth',
+    'settings',
+    'dashboard',
+  ];
   if (forbidden.includes(username)) {
     return Promise.resolve(false);
   }

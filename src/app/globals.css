@@ -14,6 +14,10 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 body {
   color: rgb(var(--foreground-rgb));
   background-color: rgb(var(--background-rgb));
@@ -138,4 +142,13 @@ button.btn img {
 
 .table th {
   @apply border-b-2 px-5 py-3 font-medium;
+}
+
+.scroll-invisible {
+  -ms-overflow-style: none; /* Internet Explorer 10+ */
+  scrollbar-width: none; /* Firefox */
+}
+
+.scroll-invisible::-webkit-scrollbar {
+  display: none; /* Safari and Chrome */
 }

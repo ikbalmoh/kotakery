@@ -26,6 +26,7 @@ import { currency } from '@/utils/formater';
 import { Switch } from '@headlessui/react';
 import { classNames } from '@/utils/helpers';
 import DeleteProductDialog from './DeleteProductDialog';
+import ProductImage from '@/components/ProductImage';
 
 type Props = {};
 
@@ -125,10 +126,6 @@ export default function Products({}: Props) {
               <thead>
                 <tr>
                   <th>Produk</th>
-                  <th className="text-right hidden md:table-cell">Harga</th>
-                  <th className="text-left w-32 hidden md:table-cell">
-                    Satuan
-                  </th>
                   <th>Tersedia</th>
                   <th></th>
                 </tr>
@@ -137,44 +134,46 @@ export default function Products({}: Props) {
                 {products.map((p, idx) => (
                   <tr key={p.id} className={p.isAvailable ? '' : 'disabled'}>
                     <td>
-                      <div className="flex flex-col">
-                        <div>{p.name}</div>
-                        <div className="md:hidden text-slate-600 text-sm">
-                          Rp {currency(p.price)}
-                          <span className="text-xs text-slate-500">
-                            /{p.unit}
-                          </span>
+                      <div className="flex flex-col md:flex-row">
+                        <div className="w-20 h-20 md:w-16 md:h-16 rounded-md relative md:mr-3 bg-gray-200">
+                          <ProductImage
+                            image={p.image ? (p.image as string) : null}
+                            name={p.name}
+                            className="rounded-md"
+                          />
+                        </div>
+                        <div className="flex flex-col mt-3 md:mt-0">
+                          <div>{p.name}</div>
+                          <div className="mt-0.5 md:mt-1">
+                            <span className="font-semibold text-slate-700 text-sm">
+                              Rp {currency(p.price)}
+                            </span>
+                            <span className="text-xs text-slate-500">
+                              /{p.unit}
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </td>
-                    <td className="text-right hidden md:table-cell">
-                      Rp {currency(p.price)}
-                    </td>
-                    <td className="text-left text-slate-500 text-sm hidden md:table-cell">
-                      /{p.unit}
-                    </td>
-                    <td className="w-[74px]">
-                      <div className="w-[74px]">
-                        <Switch
-                          checked={p.isAvailable}
-                          onChange={(status) =>
-                            updateProductAvailability(p.id!, status)
-                          }
+                    <td className="text-center w-[50px]">
+                      <Switch
+                        checked={p.isAvailable}
+                        onChange={(status) =>
+                          updateProductAvailability(p.id!, status)
+                        }
+                        className={classNames(
+                          p.isAvailable ? 'bg-green-500 ' : 'bg-gray-300',
+                          'relative inline-flex h-[22px] w-[46px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75'
+                        )}
+                      >
+                        <span
+                          aria-hidden="true"
                           className={classNames(
-                            p.isAvailable ? 'bg-green-500 ' : 'bg-gray-300',
-                            'relative inline-flex h-[30px] w-[63px] shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus-visible:ring-2  focus-visible:ring-white focus-visible:ring-opacity-75'
+                            p.isAvailable ? 'translate-x-6' : 'translate-x-0',
+                            'bg-white pointer-events-none inline-block h-[18px] w-[18px] transform rounded-full shadow-lg ring-0 transition duration-200 ease-in-out'
                           )}
-                        >
-                          <span className="sr-only">Use setting</span>
-                          <span
-                            aria-hidden="true"
-                            className={classNames(
-                              p.isAvailable ? 'translate-x-8' : 'translate-x-0',
-                              'bg-white pointer-events-none inline-block h-[26px] w-[26px] transform rounded-full  shadow-lg ring-0 transition duration-200 ease-in-out'
-                            )}
-                          />
-                        </Switch>
-                      </div>
+                        />
+                      </Switch>
                     </td>
                     <td className="text-center w-8">
                       <div className="flex items-center justify-center w-min">

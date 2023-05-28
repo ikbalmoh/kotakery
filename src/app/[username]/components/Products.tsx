@@ -10,12 +10,7 @@ import Button from '@/components/Button';
 import Cart from './Cart';
 import QtyButton from './QtyButton';
 import { ProductContext, ProductContextType } from '@/contexts/product';
-import { Parisienne } from 'next/font/google';
-
-const parisienne = Parisienne({
-  weight: '400',
-  subsets: ['latin'],
-});
+import ProductImage from '@/components/ProductImage';
 
 type Props = {};
 
@@ -51,13 +46,20 @@ export default function Products({}: Props) {
         </div>
       )}
       {categories.map((category) => (
-        <div key={category.id} className="">
-          <div className="px-5 py-3 sticky top-16 bg-slate-50 flex items-center">
+        <section
+          key={category.id}
+          id={category.slug!}
+          className="scroll-m-16 md:scroll-m-20"
+        >
+          <a
+            href={`#${category.slug!}`}
+            className="px-5 py-3 bg-slate-50 flex items-center"
+          >
             <InboxStackIcon className="w-5 h-5 text-slate-500 mr-3" />
             <span className="font-semibold text-slate-600 text-base">
               {category.name}
             </span>
-          </div>
+          </a>
           <div className="grid grid-cols-12 gap-3 px-3 pb-3">
             {category.items?.map((product) => (
               <div
@@ -67,28 +69,11 @@ export default function Products({}: Props) {
                 key={product.id}
               >
                 <div className="w-full bg-gray-200 h-40 rounded-t-lg relative">
-                  {product.image ? (
-                    <Image
-                      alt="image"
-                      fill
-                      className="rounded-t-lg"
-                      style={{
-                        objectFit: 'cover',
-                        width: '100%',
-                        height: '100%',
-                      }}
-                      src={product.image as string}
-                    />
-                  ) : (
-                    <div
-                      className={classNames(
-                        'flex items-center justify-center w-full h-full text-slate-500 text-2xl truncate px-5 select-none',
-                        parisienne.className
-                      )}
-                    >
-                      {product.name.split(' ').at(0)?.slice(0, 8)}
-                    </div>
-                  )}
+                  <ProductImage
+                    image={product.image ? (product.image as string) : null}
+                    name={product.name}
+                    className="rounded-t-lg z-0"
+                  />
                 </div>
                 <div className="p-3">
                   <div className="font-medium text-base text-slate-800">
@@ -123,10 +108,10 @@ export default function Products({}: Props) {
               </div>
             ))}
           </div>
-        </div>
+        </section>
       ))}
       {totalItems > 0 && (
-        <div className="p-5 bg-white flex items-center fixed bottom-0 left-0 right-0 intro-y border-t border-red-500">
+        <div className="p-5 bg-white flex items-center fixed bottom-0 left-0 right-0 intro-y border-t border-red-500 z-30">
           <div className="flex-1 mr-3 flex flex-col">
             <span className="text-sm text-slate-600">{totalItems} produk</span>
             <div className="font-bold text-base">Rp{currency(subtotal)}</div>
