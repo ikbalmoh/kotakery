@@ -7,6 +7,7 @@ import { Metadata } from 'next';
 import React from 'react';
 import { classNames } from '@/utils/helpers';
 import { Toaster } from 'react-hot-toast';
+import Navbar from './components/Navbar';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -42,6 +43,7 @@ export default async function RootLayout({
         )}
       >
         <NextTopLoader color="#f75728" />
+        <Navbar />
         {children}
         <Toaster toastOptions={{ duration: 3000 }} />
       </body>

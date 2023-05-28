@@ -30,7 +30,7 @@ export default function ProductImage({ image, name, className }: Props) {
   ) : (
     <div
       className={classNames(
-        'flex items-center justify-center w-full h-full text-slate-500 text-2xl truncate px-5 select-none',
+        'flex items-center justify-center w-full h-full text-slate-500 text-2xl truncate px-5 select-none z-0',
         parisienne.className,
         className ?? ''
       )}

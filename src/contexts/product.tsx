@@ -1,36 +1,35 @@
-import { createContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import Category from '@/@types/category';
 import Product from '@/@types/product';
 import { merchantCategories, merchantProducts } from '@/firebase/db/product';
+import { MerchantContext, MerchantContextType } from './merchant';
 
 export interface ProductContextType {
   initializing: boolean;
   categories: Array<Category>;
   products: Array<Product>;
-  favorites: Array<string>;
 }
 
 export const ProductContext = createContext<ProductContextType | null>(null);
 
 export function ProductContextProvider({
-  id,
   children,
 }: {
-  id: string;
   children: React.ReactNode;
 }) {
+  const { merchant } = useContext(MerchantContext) as MerchantContextType;
+
   const [initializing, setInitializing] = useState<boolean>(true);
   const [categories, setCategories] = useState<Array<Category>>([]);
   const [products, setProducts] = useState<Array<Product>>([]);
-  const [favorites, setFavorites] = useState<Array<string>>([]);
 
   useEffect(() => {
     const loadProducts = async () => {
       try {
-        const _products = await merchantProducts(id);
+        const _products = await merchantProducts(merchant.id!);
         setProducts(_products);
 
-        let _categories = await merchantCategories(id);
+        let _categories = await merchantCategories(merchant.id!);
 
         _categories = _categories
           .map((category) => {
@@ -44,7 +43,6 @@ export function ProductContextProvider({
 
         setCategories(_categories);
 
-        const cartStorage = localStorage.getItem('cart');
         setInitializing(false);
       } catch (error) {
         setInitializing(false);
@@ -53,7 +51,7 @@ export function ProductContextProvider({
 
     loadProducts();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [merchant]);
 
   return (
     <ProductContext.Provider
@@ -61,7 +59,6 @@ export function ProductContextProvider({
         initializing,
         categories,
         products,
-        favorites,
       }}
     >
       {children}

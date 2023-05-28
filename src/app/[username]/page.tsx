@@ -5,9 +5,9 @@ import { getMerchantByUsername } from '@/firebase/db/account';
 import NotFound from '@/components/NotFound';
 import { ProductContextProvider } from '@/contexts/product';
 import { CartContextProvider } from '@/contexts/cart';
-import Navbar from './components/Navbar';
-import Image from 'next/image';
 import Products from './components/Products';
+import Header from './components/Header';
+import { MerchantProvider } from '@/contexts/merchant';
 
 type Props = {
   params: { username: string };
@@ -23,13 +23,17 @@ export default async function Page({ params }: Props) {
   }
 
   return (
-    <ProductContextProvider id={merchant.id!}>
-      <CartContextProvider merchant={merchant!}>
-        <Navbar merchant={merchant} />
-        <main className="container mx-auto" style={{ minHeight: '85vh' }}>
-          <Products />
-        </main>
-      </CartContextProvider>
-    </ProductContextProvider>
+    <MerchantProvider merchant={merchant}>
+      <ProductContextProvider>
+        <CartContextProvider>
+          <main className="container mx-auto" style={{ minHeight: '85vh' }}>
+            <Header />
+            <div className="h-5"></div>
+            <Products />
+            <div className="h-96"></div>
+          </main>
+        </CartContextProvider>
+      </ProductContextProvider>
+    </MerchantProvider>
   );
 }

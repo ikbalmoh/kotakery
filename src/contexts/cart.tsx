@@ -1,10 +1,10 @@
 'use client';
 
-import MerchantAccount from '@/@types/account';
 import { CartItem, OrderForm, Transaction } from '@/@types/cart';
 import { storeTransaction } from '@/firebase/db/transaction';
 import { Timestamp } from 'firebase/firestore';
-import { createContext, useState, useEffect } from 'react';
+import { createContext, useState, useEffect, useContext } from 'react';
+import { MerchantContext, MerchantContextType } from './merchant';
 
 export interface CartContextType {
   cart: Array<CartItem>;
@@ -18,12 +18,12 @@ export interface CartContextType {
 export const CartContext = createContext<CartContextType | null>(null);
 
 export function CartContextProvider({
-  merchant,
   children,
 }: {
-  merchant: MerchantAccount;
   children: React.ReactNode;
 }) {
+  const { merchant } = useContext(MerchantContext) as MerchantContextType;
+
   const [cart, setCart] = useState<Array<CartItem>>([]);
 
   const totalItems: number = cart.reduce((a, b) => a + b.qty, 0);

@@ -10,6 +10,7 @@ export default interface Category {
   merchantId?: string;
   name: string;
   items?: Array<Product>;
+  slug?: string;
 }
 
 export const categoryConverter = {
@@ -26,6 +27,7 @@ export const categoryConverter = {
       id: snapshot.id,
       name: data.name,
       merchantId: data.merchantId,
+      slug: data.name.toLowerCase().replaceAll(' ', '-'),
     };
   },
 };
