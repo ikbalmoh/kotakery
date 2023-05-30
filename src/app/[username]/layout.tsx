@@ -20,7 +20,7 @@ export async function generateMetadata({
     params.username
   );
   return {
-    title: merchant?.name ?? 'Halaman tidak tersedia | Kotakery',
+    title: `${merchant?.name ?? 'Halaman tidak tersedia'} | Kotakery`,
     description: merchant
       ? `Belanja di ${merchant?.name} lebih mudah kini hadir di Kotakery`
       : 'Kotakery',

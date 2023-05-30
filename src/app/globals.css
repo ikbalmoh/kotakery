@@ -152,3 +152,7 @@ button.btn img {
 .scroll-invisible::-webkit-scrollbar {
   display: none; /* Safari and Chrome */
 }
+
+.sticky-bar {
+  @apply z-30 w-full mx-0 fixed top-16 left-0 right-0;
+}

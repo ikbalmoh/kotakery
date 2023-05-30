@@ -5,8 +5,8 @@ import NextTopLoader from 'nextjs-toploader';
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata = {
-  title: 'Kotakery Merchant',
-  description: 'Kotakery Dashboard for Merchant',
+  title: 'Kotakery',
+  description: 'Kotakery',
 };
 
 export default function RootLayout({
