@@ -156,3 +156,93 @@ button.btn img {
 .sticky-bar {
   @apply z-30 w-full mx-0 fixed top-16 left-0 right-0;
 }
+
+@layer utilities {
+  @keyframes animate-floating {
+    0% {
+      transform: translate(0, 0);
+    }
+    50% {
+      transform: translate(15px, 15px);
+    }
+    100% {
+      transform: translate(0, 0);
+    }
+  }
+  @keyframes animate-card-1 {
+    0% {
+      transform: translate(0, 10px);
+    }
+    50% {
+      transform: translate(10px, 10px);
+    }
+    100% {
+      transform: translate(0, 10px);
+    }
+  }
+  @keyframes animate-card-2 {
+    0% {
+      transform: translate(15px, 0); /* 20 0 */
+    }
+    50% {
+      transform: translate(15px, 15px); /* 20 16 */
+    }
+    100% {
+      transform: translate(15px, 0); /* 20 0 */
+    }
+  }
+  @keyframes animate-card-3 {
+    0% {
+      transform: translate(0px, 0);
+    }
+    50% {
+      transform: translate(20px, 10px);
+    }
+    100% {
+      transform: translate(0px, 0);
+    }
+  }
+  @keyframes animate-card-4 {
+    0% {
+      transform: translate(0px, 0);
+    }
+    50% {
+      transform: translate(20px, 20px); 
+    }
+    100% {
+      transform: translate(0px, 0);
+    }
+  }
+
+  .animate-floating {
+    animation: animate-floating 3s ease-in-out infinite;
+  }
+  .animate-card-1 {
+    animation: animate-card-1 5s ease-in-out infinite;
+  }
+  .animate-card-2 {
+    animation: animate-card-2 5s ease-in-out infinite;
+  }
+  .animate-card-3 {
+    animation: animate-card-3 6s ease-in-out infinite;
+  }
+  .animate-card-4 {
+    animation: animate-card-4 10s ease-in-out infinite;
+  }
+}
+
+.floating-element {
+  @apply animate-floating;
+}
+.floating-card-1 {
+  @apply animate-card-1;
+}
+.floating-card-2 {
+  @apply animate-card-2;
+}
+.floating-card-3 {
+  @apply animate-card-3;
+}
+.floating-card-4 {
+  @apply animate-card-4;
+}
