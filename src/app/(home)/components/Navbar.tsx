@@ -1,6 +1,5 @@
 import Link from 'next/link'
 import Image from 'next/image'
-import Button from '@/components/Button';
 
 export default function Navbar() {
   return (
@@ -21,18 +20,11 @@ export default function Navbar() {
           <div className='flex items-center'>
             <div className='hidden md:block'>
               <Link
-                href={'/auth/signin'}
-                className='btn btn-transparent intro-y mx-2'
+                href='/auth/signin'
+                className='bg-transparent border rounded border-[#F54C30] text-[#F54C30] shadow-none w-min whitespace-nowrap hover:bg-[#ffebe8] px-5 py-[5px] font-medium transition-all'
               >
-                MASUK
+                <span>Masuk</span>
               </Link>
-              <Link
-                href={'/auth/signup'}
-                className='btn btn-transparent intro-y mx-2'
-              >
-                DAFTAR
-              </Link>
-              <Button transparent danger label='Masuk' formTarget={'/auth/signin'}/>
             </div>
           </div>
           <div className='-mr-2 flex md:hidden'>
