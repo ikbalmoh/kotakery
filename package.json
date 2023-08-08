@@ -36,5 +36,8 @@
   "devDependencies": {
     "@types/cleave.js": "^1.4.7",
     "@types/numeral": "^2.0.2"
+  },
+  "volta": {
+    "node": "18.16.0"
   }
 }
