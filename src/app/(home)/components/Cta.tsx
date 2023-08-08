@@ -30,4 +30,4 @@ const Cta = ({ href, label, dark }: ButtonProps) => {
     </Link>
   );
 };
-export default Cta;
+export default Cta
